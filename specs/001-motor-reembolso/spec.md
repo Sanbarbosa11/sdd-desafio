@@ -26,6 +26,11 @@ e impede você de mover a trave depois.>
 
 - Não determina se o colaborador está em viagem, e portanto não aplica a
   ampliação de 50% prevista no item 6 da política. Ver AMB-007.
+- Não atribui efeito a campos da entrada que nenhuma regra utilize —
+  identificador, nome e centro de custo do colaborador, rótulo de competência
+  do período e descrição da despesa. Esses campos são aceitos, opcionais, e
+  não alteram nenhum resultado. O fornecedor não é interpretado, mas é
+  obrigatório, por ser chave de comparação da RN-009. Ver AMB-015.
 
 ## 4. Entrada e saída
 
@@ -96,16 +101,15 @@ categoria conforme a RN-001; não há ampliação por viagem (AMB-007).
 **Regra:** uma despesa cujo valor é estritamente maior que R$ 100,00 exige
 nota fiscal. Uma despesa de valor menor ou igual a R$ 100,00 não exige nota
 fiscal, tenha ela nota ou não. A comparação usa o valor lançado da despesa,
-já normalizado conforme a AMB-014, antes de qualquer aplicação de limite; o
-valor reembolsável não interfere na exigência. Uma despesa que exige nota fiscal e a
-apresenta não sofre nenhum efeito desta regra e segue para o limite da sua
-categoria. Uma despesa que exige nota fiscal e não a apresenta é recusada
-conforme a RN-004.
+já normalizado conforme a RN-011, antes de qualquer aplicação de limite; o
+valor reembolsável não interfere na exigência. Uma despesa que exige nota
+fiscal e a apresenta não sofre nenhum efeito desta regra e segue para o
+limite da sua categoria. Uma despesa que exige nota fiscal e não a
+apresenta é recusada conforme a RN-004.
 **Origem:** política do RH, item 5; decisões AMB-004 e AMB-006
 **Depende de:** RN-002 (reembolso parcial, decidido na AMB-002); RN-004
-(recusa por ausência de nota fiscal exigida, decidida na AMB-005); AMB-014
-(precisão monetária, que define a fronteira para valores como 100,004),
-pendente.
+(recusa por ausência de nota fiscal exigida, decidida na AMB-005); RN-011
+(normalização monetária, que define a fronteira para valores como 100,004).
 **Aceite:**
 - d-003 (06/07, transporte urbano, 100,00, sem NF) → nota fiscal não exigida;
   reembolso 80,00, parcial.
@@ -113,6 +117,10 @@ pendente.
   ausente; reembolso 0,00, recusado (RN-004).
 - Transporte urbano de 100,01, com NF → nota fiscal exigida e presente;
   reembolso 80,00, parcial.
+- Despesa de 100,004 → valor normalizado 100,00 (RN-011); nota fiscal não
+  exigida.
+- Despesa de 100,005 → valor normalizado 100,01 (RN-011); nota fiscal
+  exigida.
 - Alimentação de 50,00, sem NF → nota fiscal não exigida; reembolso 50,00,
   integral.
 - Alimentação de 500,00, sem NF → nota fiscal exigida e ausente, embora o
@@ -247,9 +255,10 @@ CATEGORIA_INELEGIVEL na sua lista de motivos (RN-007).
 
 **Regra:** duas ou mais despesas formam um grupo de duplicatas quando
 coincidem em data, categoria normalizada (RN-008), fornecedor normalizado
-(RN-008) e valor normalizado (AMB-014). A descrição e a presença de nota
-fiscal não integram o critério. Só integram grupos as despesas que não receberam motivo de nenhuma
-outra regra de elegibilidade e que não têm erro de item (RN-010): uma despesa
+(RN-008) e valor normalizado (RN-011). A descrição e a presença de nota
+fiscal não integram o critério. Só integram grupos as despesas que não
+receberam motivo de nenhuma outra regra de elegibilidade e que não têm erro
+de item (RN-010): uma despesa
 fora do período, de categoria inelegível, sem a nota fiscal exigida ou com
 erro de item nunca é mantida nem recusada como duplicata. Dentro de um grupo,
 a despesa de menor identificador é avaliada normalmente e as demais são
@@ -259,8 +268,8 @@ caractere, sem extração de número; com identificadores de larguras
 diferentes, "d-10" precede "d-9". O resultado não depende da ordem das
 despesas na entrada.
 **Origem:** política do RH, item 8; decisão AMB-011
-**Depende de:** RN-007 (lista de motivos); RN-008 (categoria normalizada);
-AMB-014 (valor normalizado), pendente.
+**Depende de:** RN-007 (lista de motivos); RN-008 (categoria e fornecedor
+normalizados); RN-011 (valor normalizado).
 **Aceite:**
 - d-006 e d-007 (09/07, alimentação, Bistro Central, 54,90, com NF) → grupo de
   duplicatas; d-006 → reembolso 54,90, integral, lista de motivos vazia;
@@ -296,9 +305,10 @@ situações:
    de início posterior à data de fim, período ausente, ou arquivo malformado.
    Nenhuma despesa é processada e o lote é rejeitado.
 2. **Erro de item** — uma despesa não pode ser avaliada por campo obrigatório
-   ausente, tipo incompatível, data inválida ou valor menor ou igual a zero.
-   A despesa é classificada como erro, com reembolso 0,00, e não é avaliada
-   por nenhuma regra de elegibilidade ou de valor; não integra grupo de
+   ausente, tipo incompatível, data inválida ou valor normalizado (RN-011)
+   menor ou igual a zero. A despesa é classificada como erro, com reembolso
+   0,00, e não é avaliada por nenhuma regra de elegibilidade ou de valor;
+   não integra grupo de
    duplicatas (RN-009). As demais despesas do lote são processadas
    normalmente.
 3. **Recusa** — a despesa é bem formada e uma regra de elegibilidade a
@@ -306,9 +316,12 @@ situações:
    com seus motivos (RN-007).
 
 Os valores monetários aceitos são estritamente maiores que zero; um valor
-igual ou inferior a zero constitui erro de item.
-**Origem:** decisão AMB-017
-**Depende de:** §4 (contrato de entrada), pendente — ver §10.
+igual ou inferior a zero constitui erro de item. A faixa é avaliada sobre o
+valor já normalizado para duas casas decimais (RN-011), e não sobre o valor
+escrito na entrada.
+**Origem:** decisões AMB-014 e AMB-017
+**Depende de:** RN-011 (normalização monetária); §4 (contrato de entrada),
+pendente — ver §10.
 **Aceite:**
 - d-009 (11/07, transporte urbano, −45,00, sem NF) → erro de item; reembolso
   0,00; não é avaliada por nenhuma regra de elegibilidade.
@@ -319,7 +332,29 @@ igual ou inferior a zero constitui erro de item.
 - Despesa sem o campo de valor → erro de item; as demais despesas do lote são
   processadas.
 - Despesa de valor 0,00 → erro de item.
+- Despesa de valor 0,004 → valor normalizado 0,00; erro de item.
 - Um erro de item em uma despesa não altera o resultado de nenhuma outra.
+
+### RN-011 — Normalização monetária
+
+**Regra:** todo valor monetário da entrada é normalizado para duas casas
+decimais por arredondamento, com a metade arredondada para cima, antes da
+aplicação de qualquer regra — inclusive da validação de faixa da RN-010. O
+valor normalizado é o único considerado em todo o processamento:
+comparações de limite (RN-001, RN-002), exigência de nota fiscal (RN-003),
+critério de duplicidade (RN-009) e cálculo do reembolso. É também o valor
+apresentado na saída.
+**Origem:** decisão AMB-014
+**Aceite:**
+- d-011 (15/07, alimentação, 33,333, com NF) → valor normalizado 33,33;
+  reembolso 33,33, integral.
+- Despesa de 100,004 → valor normalizado 100,00; nota fiscal não exigida.
+- Despesa de 100,005 → valor normalizado 100,01; nota fiscal exigida.
+- Alimentação de 60,004 → valor normalizado 60,00; reembolso 60,00, integral.
+- 54,90 e 54,904 → ambos normalizados para 54,90; coincidindo nos demais
+  campos do critério, formam grupo de duplicatas (RN-009).
+- 54,90 e 54,900 → o mesmo valor, 54,90.
+- Despesa de 0,004 → valor normalizado 0,00; erro de item (RN-010).
 
 ---
 
@@ -869,8 +904,108 @@ inclusão de novas categorias cabe ao RH, por alteração da política.
 - "Bistro Central", "BISTRO CENTRAL" e " Bistro Central " são o mesmo
   fornecedor; "Bistrô Central" não é
 
-**Regra afetada:** RN-008; RN-009 (fornecedor normalizado); RN-004 (o motivo CATEGORIA_INELEGIVEL, já citado
-ali, passa a existir)
+**Regra afetada:** RN-008; RN-009 (fornecedor normalizado); RN-004 (o motivo
+CATEGORIA_INELEGIVEL, já citado ali, passa a existir)
+
+### AMB-014 — Precisão monetária
+
+**Texto original do RH:** não há. A política expressa seus limites em reais
+inteiros e não estabelece tratamento para valores com precisão inferior ao
+centavo. O arquivo de exemplo contém d-011 com valor 33,333.
+**O que não está claro:** duas questões. (i) como tratar um valor com mais de
+duas casas decimais — arredondar, truncar ou considerar dado inválido; (ii)
+em que momento a normalização ocorre: antes de qualquer regra, ou apenas
+sobre o valor a ser reembolsado.
+**Decisão:** todo valor monetário da entrada é normalizado para duas casas
+decimais por arredondamento, com a metade arredondada para cima, antes da
+aplicação de qualquer regra. O valor normalizado é o único valor considerado
+em todo o processamento — comparações de limite, exigência de nota fiscal,
+critério de duplicidade e cálculo do reembolso — e é também o valor
+apresentado na saída. A normalização precede a validação de faixa da RN-010.
+**Justificativa:** o arredondamento comercial com a metade para cima é a
+convenção que o colaborador e o auditor reconhecem sem precisar da regra
+escrita; o arredondamento para o par, embora estatisticamente neutro,
+produziria resultados contraintuitivos em valores vizinhos, e o truncamento
+favoreceria sistematicamente a empresa. Tratar precisão abaixo do centavo
+como dado inválido faria d-011 perder os R$ 33,33 integrais por uma questão
+de formato, mesma desproporção que a AMB-013 rejeitou ao normalizar a caixa
+da categoria. Quanto ao momento, normalizar na entrada é o que os registros
+já existentes pressupõem — RN-003, AMB-004, AMB-006 e RN-009 referem-se ao
+valor normalizado — e garante que a saída exiba o mesmo valor sobre o qual as
+regras operaram; normalizar apenas no resultado produziria uma despesa
+recusada por exceder R$ 100,00 exibindo valor de R$ 100,00, o que o auditor
+não conseguiria verificar. A normalização precede a validação de faixa porque,
+na ordem inversa, um valor de 0,004 seria aceito como positivo e passaria a
+constar como despesa de R$ 0,00 classificada como integral.
+**Custo aceito:** um valor cuja fração seja inferior a meio centavo deixa de
+ser considerado, e um valor cuja fração seja exatamente meio centavo é
+arredondado a favor do colaborador. Um lançamento de R$ 100,004 passa a valer
+R$ 100,00 e escapa da exigência de nota fiscal por uma diferença que não
+existe em dinheiro. Aceito porque a alternativa é operar sobre frações que não
+podem ser pagas, produzindo totais que não conferem com a soma dos itens.
+**Consequências verificáveis:**
+- d-011 (alimentação, 33,333, com NF) → valor normalizado 33,33; reembolso
+  33,33, integral
+- uma despesa de 100,004 → valor normalizado 100,00; nota fiscal não exigida
+- uma despesa de 100,005 → valor normalizado 100,01; nota fiscal exigida
+- uma despesa de 60,004 em alimentação → valor normalizado 60,00; reembolso
+  60,00, integral
+- 54,90 e 54,904 normalizam ambos para 54,90 e, coincidindo nos demais campos,
+  constituem duplicata
+- uma despesa de 0,004 → valor normalizado 0,00; erro de item, pois a
+  normalização precede a validação de faixa (RN-010)
+
+**Regra afetada:** RN-011; RN-010 (faixa sobre o valor normalizado); RN-003 e
+RN-009 (referências ao valor normalizado)
+
+### AMB-015 — Campos da entrada sem regra associada
+
+**Texto original do RH:** não há. A entrada traz o campo centro_custo no
+objeto colaborador, e nenhum item da política o menciona. O mesmo vale para o
+identificador e o nome do colaborador.
+**O que não está claro:** se esses campos afetam o cálculo, se devem ser
+reproduzidos na saída, e se são obrigatórios no contrato de entrada. As
+leituras consideradas foram: (a) declará-los fora de escopo, lidos e sem
+efeito; (b) mantê-los fora do cálculo mas reproduzi-los na saída; (c)
+atribuir-lhes efeito sobre limites ou elegibilidade.
+**Decisão:** adotada a leitura (a), aplicada a todos os campos da entrada que
+nenhuma regra utiliza. São eles, na entrada de referência: o identificador, o
+nome e o centro de custo do colaborador; o rótulo de competência do período
+(AMB-016); e a descrição da despesa, que não é utilizada por regra alguma
+(AMB-007, AMB-008, AMB-009). Esses campos são aceitos na entrada, não
+participam de nenhuma regra, não afetam nenhum resultado, e são opcionais no
+contrato de entrada: sua ausência não constitui erro. O fornecedor não
+integra esta lista: é utilizado pela RN-009 como chave de comparação e é,
+portanto, campo obrigatório. O que não é utilizado é o seu conteúdo — o
+fornecedor não é interpretado, apenas comparado após a normalização da
+RN-008.
+**Justificativa:** atribuir efeito a um campo que a política não menciona seria
+criar regra de negócio inexistente, a objeção mais forte entre todas as
+leituras rejeitadas nesta spec. Reproduzi-los na saída comprometeria o
+contrato de saída com dados que o motor não utiliza, sem que a política o
+exija. Torná-los obrigatórios faria um lote inteiro ser rejeitado pela RN-010
+por ausência de campo sem efeito algum sobre o resultado, desproporção que a
+decisão evita. A decisão é enunciada de forma geral, e não apenas para o
+centro de custo, porque a situação é idêntica para os três campos e um
+critério único evita decisões separadas para cada um.
+**Custo aceito:** se a política passar a estabelecer regras por centro de
+custo — limites diferenciados, por exemplo — a spec precisará ser alterada
+para incorporar o campo. Hoje não há perda, pois nenhum resultado depende
+dele.
+**Consequências verificáveis:**
+- o centro de custo CC-ENG-PLATAFORMA do arquivo de exemplo não altera
+  nenhum resultado
+- um lote cujo colaborador não traga centro de custo é processado normalmente
+- dois lotes idênticos em tudo exceto o centro de custo produzem resultados
+  idênticos
+- uma despesa sem descrição é processada normalmente
+- um lote sem rótulo de competência, com início e fim presentes, é processado
+  normalmente
+- uma despesa sem fornecedor → erro de item (RN-010), por ser campo
+  obrigatório
+
+**Regra afetada:** nenhuma RN; §3 (fora de escopo); §4 (contrato de entrada,
+campos opcionais e obrigatoriedade do fornecedor)
 
 ### AMB-016 — Representação do período de competência
 
@@ -928,15 +1063,15 @@ motivo, exceto o que impeça o processamento do lote.
    início posterior à data de fim, período ausente, ou arquivo malformado.
    Nenhuma despesa é processada e o lote é rejeitado.
 2. Erro de item — uma despesa não pode ser avaliada por campo obrigatório
-   ausente, tipo incompatível, data inválida ou valor menor ou igual a zero.
-   A despesa recebe a classificação erro, com reembolso 0,00, e não é
-   avaliada por nenhuma regra de elegibilidade ou de valor. As demais
-   despesas do lote são processadas normalmente.
+   ausente, tipo incompatível, data inválida ou valor normalizado (AMB-014)
+   menor ou igual a zero. A despesa recebe a classificação erro, com
+   reembolso 0,00, e não é avaliada por nenhuma regra de elegibilidade ou de
+   valor. As demais despesas do lote são processadas normalmente.
 3. Recusa — a despesa é bem formada e uma regra de elegibilidade a rejeita.
    Recebe a classificação recusada, com seus motivos.
 
 Os valores monetários aceitos são estritamente maiores que zero; um valor
-igual ou inferior a zero constitui erro de item.
+normalizado (AMB-014) igual ou inferior a zero constitui erro de item.
 
 **Justificativa:** o critério estrutural mantém a fronteira estável — depende
 do contrato da entrada, não do conjunto de regras vigentes. O critério (b) a
@@ -1037,6 +1172,7 @@ para que o resultado seja determinístico.
 | Par de despesas idênticas exceto pelo identificador; esta com o menor | d-006: 09/07, alimentação, Bistro Central, 54,90, com NF | Grupo de duplicatas com d-007; mantida por ter o menor identificador; reembolso 54,90 (integral); lista de motivos vazia | RN-009 |
 | Par de despesas idênticas exceto pelo identificador; esta com o maior | d-007: 09/07, alimentação, Bistro Central, 54,90, com NF | Grupo de duplicatas com d-006; reembolso 0,00 (recusado), motivos [DUPLICATA]; o resultado não muda se a ordem na entrada for invertida | RN-009 |
 | Valor negativo (estorno) | d-009: 11/07, transporte urbano, −45,00, sem NF, "Estorno de corrida cancelada" | Erro de item (valor menor ou igual a zero); classificação erro; reembolso 0,00; não é avaliada por nenhuma regra de elegibilidade ou de valor; não abate nenhuma outra despesa | RN-010 |
+| Valor com mais de duas casas decimais | d-011: 15/07, alimentação, 33,333, com NF | Valor normalizado 33,33 (arredondamento, metade para cima) antes de qualquer regra; reembolso 33,33 (integral); a saída apresenta 33,33 | RN-011, RN-001 |
 | Categoria fora das três elegíveis | d-005: 07/07, "coworking", 89,00, com NF | Reembolso 0,00 (recusado), motivos [CATEGORIA_INELEGIVEL]; não é erro de entrada | RN-008 |
 
 ## 8. Ordem de aplicação das regras
@@ -1046,9 +1182,12 @@ muda o resultado. Declarar isso separa spec boa de spec média.>
 
 A avaliação tem três etapas:
 
-0. **Validação** (RN-010). Um erro de lote rejeita a entrada inteira, e
-   nenhuma despesa é processada. Uma despesa com erro de item é classificada
-   como erro, com reembolso 0,00, e não segue para as etapas 1 e 2.
+0. **Normalização e validação.** Primeiro, todo valor monetário é
+   normalizado para duas casas decimais (RN-011). Em seguida, a entrada é
+   validada (RN-010), com a faixa de valor avaliada sobre o valor já
+   normalizado. Um erro de lote rejeita a entrada inteira, e nenhuma despesa
+   é processada. Uma despesa com erro de item é classificada como erro, com
+   reembolso 0,00, e não segue para as etapas 1 e 2.
 1. **Elegibilidade.** Para cada despesa sem erro de item, todas as regras de
    elegibilidade são avaliadas, sem interrupção na primeira que se aplica, e
    cada uma que se aplica acrescenta seu motivo à lista de motivos (RN-007),
@@ -1062,10 +1201,14 @@ A avaliação tem três etapas:
    categoria (RN-001) e reembolso parcial (RN-002). Uma despesa com qualquer
    motivo de recusa tem reembolso 0,00 e não é avaliada contra o limite.
 
-A validação precede tudo porque uma despesa que não pode ser avaliada não
-tem como passar por nenhuma regra (origem: AMB-017). A ordem entre as etapas
-1 e 2 afeta o valor: a elegibilidade precede o limite (origem: AMB-005), de
-modo que uma despesa recusada não é avaliada contra o limite. A duplicidade
+A normalização monetária precede a validação de faixa porque, na ordem
+inversa, um valor de 0,004 seria aceito como positivo e passaria a constar
+como despesa de 0,00 classificada como integral (origem: AMB-014). A
+validação precede as demais etapas porque uma despesa que não pode ser
+avaliada não tem como passar por nenhuma regra (origem: AMB-017). A ordem
+entre as etapas 1 e 2 afeta o valor: a elegibilidade precede o limite
+(origem: AMB-005), de modo que uma despesa recusada não é avaliada contra o
+limite. A duplicidade
 vem por último na elegibilidade porque é a única regra que compara despesas
 entre si, e só deve considerar as que passaram nas demais (origem: AMB-011);
 movê-la para antes mudaria quais despesas formam grupo e, portanto, qual é
@@ -1104,4 +1247,7 @@ O sistema está pronto quando:
   o que a RN-010 não é verificável. Precisa também definir como a saída
   representa uma despesa com erro de item — em particular, se e como informa
   qual campo falhou — e o que a saída contém quando o lote é rejeitado por
-  erro de lote. Pendente até a redação da §4.
+  erro de lote. Já decidido: os campos sem regra associada — identificador,
+  nome e centro de custo do colaborador, rótulo de competência e descrição —
+  são opcionais, e o fornecedor é obrigatório (AMB-015). O restante está
+  pendente até a redação da §4.

@@ -10,6 +10,55 @@ Ordem cronológica inversa: a mais recente primeiro.
 
 ---
 
+## D-006 — Referências à normalização monetária e ordem da etapa 0 após AMB-014 e 015 · `2026-10-18`
+
+**Gatilho:** a decisão de precisão monetária (AMB-014) resolveu uma
+pendência citada em regras já salvas e fixou uma ordem dentro da etapa de
+validação; a AMB-015 acrescentou um item à seção de fora de escopo.
+
+**O que mudou na spec:**
+- RN-003, Regra: de "já normalizado conforme a AMB-014" para "conforme a
+  RN-011". Depende de: de "AMB-014 (precisão monetária, …), pendente" para
+  "RN-011 (normalização monetária, …)".
+- RN-009, Regra: de "valor normalizado (AMB-014)" para "(RN-011)". Depende
+  de: de "AMB-014 (valor normalizado), pendente" para "RN-011 (valor
+  normalizado)".
+- RN-010, Regra: de "valor menor ou igual a zero" para "valor normalizado
+  (RN-011) menor ou igual a zero"; acrescentado que a faixa é avaliada sobre
+  o valor já normalizado, e não sobre o valor escrito na entrada. Origem:
+  acrescentada a AMB-014. Depende de: acrescentada a RN-011. Aceite:
+  acrescentado o caso de 0,004.
+- §8, etapa 0: de "Validação (RN-010)" para "Normalização e validação" —
+  primeiro a normalização monetária (RN-011), depois a validação, com o
+  motivo da ordem declarado.
+- §3: acrescentado que o sistema não atribui efeito a campos da entrada que
+  nenhuma regra utilize (AMB-015).
+- §7: acrescentado d-011.
+- RN-003, Aceite: acrescentados os casos de 100,004 (nota não exigida) e
+  100,005 (nota exigida), para que as fronteiras da regra de nota fiscal
+  estejam na própria regra.
+- AMB-017, Decisão: de "valor menor ou igual a zero" e "um valor igual ou
+  inferior a zero" para "valor normalizado (AMB-014)…", para que quem lesse
+  apenas a AMB-017 não validasse o valor bruto.
+- §10, "Contrato de entrada e representação de erros": registrado como já
+  decidido que os campos sem regra associada são opcionais e o fornecedor é
+  obrigatório (AMB-015), reduzindo a pendência ao restante do contrato.
+
+**Por quê:** a spec descreve o estado atual do sistema. Regras que citavam a
+AMB-014 como pendente e uma validação de faixa sem indicar sobre qual valor
+opera permitiriam implementar a validação antes da normalização, aceitando
+0,004 como valor positivo.
+
+**O que isso invalidou:** nenhum critério de aceite. As referências da
+AMB-004, da AMB-006 e da AMB-011 ao "valor normalizado (AMB-014)" permanecem
+corretas, por apontarem para a decisão que agora existe.
+
+**Tasks afetadas:** nenhuma — tasks.md ainda não foi escrito.
+
+**Custo:** 1 arquivo, correção pontual.
+
+---
+
 ## D-005 — Registros atualizados após AMB-011, 013 e 017 · `2026-10-18`
 
 **Gatilho:** as decisões de duplicidade (AMB-011), categoria (AMB-013) e
