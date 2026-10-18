@@ -53,6 +53,15 @@ em consequências e uso da numeração da lista de trabalho em vez do ID da
 spec. Delegar a varredura foi melhor que fazer à mão: ele lê a spec inteira
 sem cansar.
 
+18/10 — AMB-007: pedi a varredura de novo, agora por referências ao estado
+de viagem. Achou quatro. Duas delas (F1 e F2) estavam no texto das próprias
+RN-001 e RN-002 afirmando que o limite pode ser ampliado por viagem — ou
+seja, as regras contradiziam a decisão que acabara de ser tomada. As duas
+anteriores (AMB-005) eram em campos de registro; estas eram no enunciado
+das regras, que é o que alguém usaria para implementar. A varredura
+sistemática depois de cada decisão virou parte do meu processo.
+
+
 ## Erros do agente
 18/10 — AMB-004: o agente afirmou que, no arquivo de exemplo, nenhuma
 despesa passa de R$ 100 antes do corte e fica abaixo depois — logo a AMB-006

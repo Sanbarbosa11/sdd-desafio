@@ -24,8 +24,8 @@
 <Lista explícita. Este bloco vale ponto: ele impede o agente de inventar feature
 e impede você de mover a trave depois.>
 
-- Não faz `<...>`
-- Não faz `<...>`
+- Não determina se o colaborador está em viagem, e portanto não aplica a
+  ampliação de 50% prevista no item 6 da política. Ver AMB-007.
 
 ## 4. Entrada e saída
 
@@ -47,11 +47,12 @@ e impede você de mover a trave depois.>
 
 Cada regra recebe um ID (`RN-001`, ...). As tasks vão referenciar esses IDs.
 
-> **Premissa:** Salvo indicação em contrário, os critérios de aceite e os casos de borda
-> deste documento assumem despesas fora de viagem, com os limites nominais da
-> política. A caracterização de viagem e a ampliação de limites são tratadas
-> na AMB-007; quando ela for decidida, os casos afetados serão revistos e os
-> que dependerem do estado de viagem passarão a declará-lo explicitamente.
+> **Limites nominais, sem ampliação por viagem:** o sistema não determina se o
+> colaborador está em viagem (AMB-007). Todas as despesas são avaliadas com os
+> limites nominais da política — alimentação R$ 60,00, transporte urbano
+> R$ 80,00, hospedagem R$ 250,00 por diária —, e os critérios de aceite e os
+> casos de borda deste documento valem para qualquer despesa, sem distinção
+> de viagem.
 
 ### RN-001 — Limite de categoria aplicado por despesa individual
 
@@ -59,16 +60,13 @@ Cada regra recebe um ID (`RN-001`, ...). As tasks vão referenciar esses IDs.
 comparada, isoladamente, com o limite da sua categoria (alimentação R$ 60,00;
 transporte urbano R$ 80,00; hospedagem R$ 250,00 por diária). Nenhuma outra
 despesa altera o resultado da despesa avaliada por meio de agregação de
-valores: não há soma de despesas da mesma categoria no mesmo dia. A eventual
-ampliação de limite por viagem é tratada na AMB-007 e opera sobre o valor do
-limite, não sobre a soma das despesas. Não existe teto diário
-agregado por categoria. Em hospedagem, o limite é por diária: o limite de um
-lançamento de hospedagem é R$ 250,00 multiplicado pelo número de diárias que
-ele cobre, número definido pela AMB-009 (pendente).
-**Origem:** política do RH, itens 1, 2 e 3; decisão AMB-001
-**Depende de:** RN-002 (reembolso parcial, decidido na AMB-002); AMB-007
-(ampliação de limite em viagem) e AMB-009 (número de diárias em lançamento de
-hospedagem), pendentes.
+valores: não há soma de despesas da mesma categoria no mesmo dia. Não existe
+teto diário agregado por categoria. Em hospedagem, o limite é por diária: o
+limite de um lançamento de hospedagem é R$ 250,00 multiplicado pelo número de
+diárias que ele cobre, número definido pela AMB-009 (pendente).
+**Origem:** política do RH, itens 1, 2 e 3; decisões AMB-001 e AMB-007
+**Depende de:** RN-002 (reembolso parcial, decidido na AMB-002); AMB-009
+(número de diárias em lançamento de hospedagem), pendente.
 **Aceite:**
 - d-001 (03/07, alimentação, 72,50) → reembolso 60,00, parcial.
 - d-002 (03/07, alimentação, 38,00) → reembolso 38,00, integral.
@@ -82,11 +80,11 @@ hospedagem), pendentes.
 tem reembolso igual ao limite aplicável; o excedente (valor menos limite) não
 é reembolsado e a despesa é classificada como parcial. Uma despesa cujo valor
 é menor ou igual ao limite aplicável tem reembolso igual ao seu valor e é
-classificada como integral. O limite aplicável é o da categoria conforme a
-RN-001, com a eventual ampliação por viagem da AMB-007.
-**Origem:** política do RH, item 4; decisão AMB-002
-**Depende de:** AMB-007 (ampliação de limite em viagem) e AMB-009 (número de
-diárias em lançamento de hospedagem), ambas pendentes.
+classificada como integral. O limite aplicável é o limite nominal da
+categoria conforme a RN-001; não há ampliação por viagem (AMB-007).
+**Origem:** política do RH, item 4; decisões AMB-002 e AMB-007
+**Depende de:** AMB-009 (número de diárias em lançamento de hospedagem),
+pendente.
 **Aceite:**
 - d-001 (03/07, alimentação, 72,50) → reembolso 60,00, parcial; excedente 12,50.
 - Alimentação de 60,00 → reembolso 60,00, integral.
@@ -105,9 +103,9 @@ categoria. Uma despesa que exige nota fiscal e não a apresenta é recusada
 conforme a RN-004.
 **Origem:** política do RH, item 5; decisões AMB-004 e AMB-006
 **Depende de:** RN-002 (reembolso parcial, decidido na AMB-002); RN-004
-(recusa por ausência de nota fiscal exigida, decidida na AMB-005); AMB-007
-(ampliação de limite em viagem) e AMB-014 (precisão monetária, que define a
-fronteira para valores como 100,004), pendentes.
+(recusa por ausência de nota fiscal exigida, decidida na AMB-005); AMB-014
+(precisão monetária, que define a fronteira para valores como 100,004),
+pendente.
 **Aceite:**
 - d-003 (06/07, transporte urbano, 100,00, sem NF) → nota fiscal não exigida;
   reembolso 80,00, parcial.
@@ -293,7 +291,7 @@ binária da documentação: o comprovante existe ou não existe. A leitura (b)
 produziria exatamente o resultado que a justificativa da AMB-006 usou para
 rejeitar a leitura pelo valor reembolsável — um jantar de R$ 500 sem
 comprovante renderia R$ 60 — esvaziando a regra em alimentação e em
-transporte fora de viagem. A leitura (d) trataria "obrigatória" como
+transporte urbano. A leitura (d) trataria "obrigatória" como
 "recomendada" e devolveria a decisão à conferência manual. A leitura (c)
 tem mérito ao distinguir o que tem conserto do que não tem, mas exigiria um
 quarto estado e um campo de valor potencial que a política não prevê, além
@@ -335,14 +333,16 @@ o valor da despesa lançado, já normalizado conforme a AMB-014, antes de
 qualquer aplicação de limite.
 **Justificativa:** a nota fiscal comprova que a transação existiu e custou o
 valor declarado — o objeto da comprovação é a despesa, não a parcela que a
-empresa decide pagar. A leitura (b) esvaziaria a regra: como o limite de
-alimentação é no máximo R$ 90 e o de transporte fora de viagem é R$ 80,
-nenhuma despesa dessas categorias poderia exigir nota, e um jantar de R$ 500
-sem comprovante renderia R$ 60. Produziria ainda o efeito invertido de
-exigir mais documentação de quem viaja, já que o limite ampliado passaria a
-ultrapassar R$ 100. A leitura (c) reintroduziria agregação, que a AMB-001
-rejeitou, abriria a questão nova de qual é o grupo, e alteraria uma
-consequência já registrada na AMB-004.
+empresa decide pagar. A leitura (b) esvaziaria a regra: como os limites são
+sempre os nominais (AMB-007) — alimentação R$ 60 e transporte urbano R$ 80,
+ambos abaixo de R$ 100 —, nenhuma despesa dessas categorias poderia exigir
+nota, qualquer que fosse o valor lançado, e um jantar de R$ 500 sem
+comprovante renderia R$ 60. O item 5 da política passaria a valer apenas
+para hospedagem, a única categoria cujo limite supera R$ 100 — e nela a
+leitura (b) produz o mesmo resultado que a (a), porque o limite de
+hospedagem nunca é inferior a R$ 250. A leitura (c) reintroduziria
+agregação, que a AMB-001 rejeitou, abriria a questão nova de qual é o grupo,
+e alteraria uma consequência já registrada na AMB-004.
 
 Quanto à coerência com a AMB-002: lá se rejeitou punir desvio mínimo porque
 a regra é de cálculo e opera sobre uma régua contínua — faz sentido pagar
@@ -379,6 +379,68 @@ reembolso cai abaixo de R$ 100 por efeito da ausência de nota deixaria de
 exigir nota, e voltaria a exigi-la ao ser reembolsado integralmente.
 **Regra afetada:** RN-003
 
+### AMB-007 — Caracterização de "em viagem" e ampliação de limites
+
+**Texto original do RH:** "Colaborador em viagem tem limites ampliados em 50%." (item 6)
+**O que não está claro:** a política não define o que caracteriza estar em
+viagem, não diz se o estado se aplica ao colaborador no período, ao dia ou à
+despesa, e não informa quais limites são ampliados. A entrada não possui
+nenhum campo que registre o estado de viagem — os únicos dados por despesa
+são data, categoria, descrição, fornecedor, valor e presença de nota fiscal.
+As leituras consideradas foram: (a) declarar a caracterização fora de escopo;
+(b) estender a entrada com um campo explícito; (c) inferir viagem a partir de
+lançamentos de hospedagem; (d) inferir a partir de termos na descrição ou no
+fornecedor; (e) considerar todo o período em viagem se houver qualquer
+hospedagem nele.
+**Decisão:** adotada a leitura (a). A caracterização de estar em viagem está
+fora do escopo deste sistema. O motor aplica sempre os limites nominais de
+cada categoria e o item 6 da política não é implementado. A premissa global
+declarada nas seções 5 e 7 deixa de ser provisória e passa a ser regra
+permanente: todas as despesas são avaliadas com os limites nominais.
+**Justificativa:** estar em viagem é um fato administrativo — alguém autoriza o
+deslocamento — e a entrada não o registra. As leituras (c), (d) e (e)
+deduzem a causa a partir de consequências e erram de formas previsíveis: a
+hospedagem não captura deslocamento sem pernoite, como a corrida ao
+aeroporto de d-003; o texto livre é sensível a grafia, produz falso positivo
+em despesas locais que mencionem hotel, e é redigido pelo próprio
+colaborador, que passaria a controlar o próprio limite; e considerar o
+período inteiro ampliaria o limite de despesas sem relação alguma com a
+viagem, como o almoço de plantão em sábado de d-012. As três também fariam o
+reembolso de uma despesa depender da existência de outra no mesmo lote,
+contrariando a justificativa da AMB-001, segundo a qual o colaborador sabe
+se uma despesa será paga no momento em que a faz. A leitura (b) exigiria
+estender um formato de entrada que o enunciado declara fixo, e produziria
+viagem autodeclarada. Entre inferir um fato que o dado não contém e declarar
+que o sistema não o determina, a segunda é a única posição que o motor
+consegue sustentar diante de uma auditoria.
+**Custo aceito:** o item 6 da política não é cumprido pelo motor, e o erro é
+sempre na mesma direção — contra o colaborador em viagem, nunca contra a
+empresa. No arquivo de exemplo, d-010 (hospedagem de 480,00 com nota)
+recebe 250,00 em vez dos 375,00 que receberia se a diária fosse ampliada,
+caso o lançamento conte uma diária; a diferença é de 125,00. Despesas de
+alimentação e transporte de colaboradores efetivamente em viagem são
+limitadas a 60,00 e 80,00 em vez de 90,00 e 120,00. A regularização desses
+casos permanece com o financeiro, por conferência manual. Aceito porque a
+alternativa é o motor conceder ampliação com base em indício que ele não
+consegue comprovar, produzindo resultado que o auditor não tem como
+verificar e que o colaborador pode influenciar.
+**Consequências verificáveis:**
+- todos os limites são os nominais: alimentação 60,00; transporte urbano
+  80,00; hospedagem 250,00 por diária
+- d-010 (hospedagem, 480,00, com NF) → limite 250,00 por diária, sem
+  ampliação; resultado final condicionado à AMB-009
+- d-011 (alimentação, 15/07, no mesmo fornecedor de d-010) → limite 60,00;
+  a proximidade com um lançamento de hospedagem não altera o limite
+- d-003 (transporte urbano, 100,00, "Corrida aeroporto") → limite 80,00; a
+  descrição não altera o limite
+- d-013 (hospedagem, 690,00, sem NF) → recusado pela RN-004; a ausência de
+  efeito sobre outras despesas é consequência desta decisão, não da recusa
+- todos os aceites e casos de borda já registrados permanecem válidos sem
+  alteração
+
+**Em aberto:** registrado na §10.
+**Regra afetada:** RN-001, RN-002; §3 (fora de escopo)
+
 <A política tem no mínimo oito. Se você achou menos, releia
 `exemplos/despesas-exemplo.json` — cada item daquele arquivo existe por um motivo.>
 
@@ -386,11 +448,12 @@ exigir nota, e voltaria a exigi-la ao ser reembolsado integralmente.
 
 ## 7. Casos de borda
 
-> **Premissa:** Salvo indicação em contrário, os critérios de aceite e os casos de borda
-> deste documento assumem despesas fora de viagem, com os limites nominais da
-> política. A caracterização de viagem e a ampliação de limites são tratadas
-> na AMB-007; quando ela for decidida, os casos afetados serão revistos e os
-> que dependerem do estado de viagem passarão a declará-lo explicitamente.
+> **Limites nominais, sem ampliação por viagem:** o sistema não determina se o
+> colaborador está em viagem (AMB-007). Todas as despesas são avaliadas com os
+> limites nominais da política — alimentação R$ 60,00, transporte urbano
+> R$ 80,00, hospedagem R$ 250,00 por diária —, e os critérios de aceite e os
+> casos de borda deste documento valem para qualquer despesa, sem distinção
+> de viagem.
 
 | Caso | Entrada | Comportamento esperado | Regra |
 |---|---|---|---|
@@ -442,8 +505,9 @@ O sistema está pronto quando:
   informal podem não emitir nota. A spec não diferencia fornecedores porque a
   política não prevê essa distinção; acomodá-la exigiria regra específica
   sobre formas alternativas de comprovação, que caberia ao RH definir.
-- **Hospedagem recusada como indício de viagem (origem: AMB-005; afeta
-  AMB-007).** Se a caracterização de viagem vier a ser inferida a partir de
-  despesas de hospedagem, será preciso decidir se uma hospedagem recusada por
-  ausência de nota fiscal (RN-004) — como d-013 — ainda caracteriza viagem.
-  A decisão cabe à AMB-007.
+- **Ampliação de limites em viagem (origem: AMB-007).** O item 6 da política
+  não é implementado porque a entrada não registra o estado de viagem. Para
+  implementá-lo seria necessário um campo explícito na entrada, informado
+  pelo processo que autoriza a viagem — não pelo colaborador que lança a
+  despesa. Enquanto isso não existir, colaboradores em viagem recebem menos
+  do que a política lhes garante, e a regularização cabe ao financeiro.

@@ -10,6 +10,60 @@ Ordem cronológica inversa: a mais recente primeiro.
 
 ---
 
+## D-002 — Premissa de viagem tornada permanente após a AMB-007 · `2026-10-18`
+
+**Gatilho:** a decisão da AMB-007 (leitura a: caracterização de viagem fora
+de escopo) tornou obsoletos registros já salvos que tratavam a viagem como
+pendência: a premissa global das seções 5 e 7 e os campos "Depende de" das
+RN-001, RN-002 e RN-003.
+
+**O que mudou na spec:**
+- §5 e §7, premissa global: de "assumem despesas fora de viagem… quando
+  ela for decidida, os casos afetados serão revistos" para regra permanente
+  de limites nominais, sem ampliação por viagem e sem previsão de revisão.
+- RN-001, RN-002 e RN-003, "Depende de": a AMB-007 foi removida.
+- §3: novo item — o sistema não determina se o colaborador está em viagem e
+  não aplica a ampliação de 50% do item 6. Os marcadores de modelo da seção
+  foram substituídos por esse item.
+- §10: o item "Hospedagem recusada como indício de viagem" deixou de existir
+  e foi substituído por "Ampliação de limites em viagem".
+- RN-001, Regra: removida a frase "A eventual ampliação de limite por viagem
+  é tratada na AMB-007 e opera sobre o valor do limite, não sobre a soma das
+  despesas." Origem: de "decisão AMB-001" para "decisões AMB-001 e AMB-007".
+- RN-002, Regra: de "O limite aplicável é o da categoria conforme a RN-001,
+  com a eventual ampliação por viagem da AMB-007" para "O limite aplicável é
+  o limite nominal da categoria conforme a RN-001; não há ampliação por
+  viagem (AMB-007)". Origem: de "decisão AMB-002" para "decisões AMB-002 e
+  AMB-007".
+- AMB-005, Justificativa: de "esvaziando a regra em alimentação e em
+  transporte fora de viagem" para "esvaziando a regra em alimentação e em
+  transporte urbano".
+- AMB-006, Justificativa: de "o limite de alimentação é no máximo R$ 90 e o
+  de transporte fora de viagem é R$ 80… Produziria ainda o efeito invertido
+  de exigir mais documentação de quem viaja" para "os limites são sempre os
+  nominais (AMB-007) — alimentação R$ 60 e transporte urbano R$ 80, ambos
+  abaixo de R$ 100… O item 5 da política passaria a valer apenas para
+  hospedagem", sem o argumento do efeito invertido.
+
+**Por quê:** a spec descreve o estado atual do sistema. Uma premissa
+declarada como provisória, dependências apontando para uma ambiguidade já
+decidida e regras que preveem ampliação por viagem fariam o leitor — ou quem
+implementa a partir das RN-001 e RN-002 — supor que os limites ainda podem
+mudar por viagem.
+
+**O que isso invalidou:** nenhuma regra ou critério de aceite — todos já
+assumiam despesas fora de viagem e permanecem válidos. A pendência da §10
+sobre hospedagem recusada como indício de viagem deixou de existir. Na
+justificativa da AMB-006, o argumento do efeito invertido sobre quem viaja
+deixou de se aplicar e foi removido; a decisão da AMB-006 se sustenta pela
+razão restante, reforçada.
+
+**Tasks afetadas:** nenhuma — tasks.md ainda não foi escrito.
+
+**Custo:** 1 arquivo, correção pontual.
+
+---
+
 ## D-001 — Registros das AMB-001, 002, 004 e 006 atualizados após a AMB-005 · `2026-10-18`
 
 **Gatilho:** a decisão da AMB-005 tornou obsoletas afirmações registradas nas
