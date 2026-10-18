@@ -86,6 +86,15 @@ próprio pedido, mas a redação que propus não a resolvia. Ele apontou a
 contradição e separou "campo não utilizado" de "campo usado apenas como
 chave, sem interpretação do conteúdo". Erro meu, pego por ele.
 
+18/10 — §4/RN-012: pedi que a RN-012 declarasse que "d-006" e "D-006" não
+formam duplicata. Estava errado: o identificador não integra o critério de
+duplicidade da RN-009 (data, categoria, fornecedor, valor), então os dois
+formam duplicata como qualquer par coincidente. Ele recusou a alteração,
+explicou a contradição que ela criaria, e a análise expôs uma lacuna real
+que nenhum de nós tinha visto: se formam duplicata, qual é mantida? A
+RN-009 dizia "ordem lexicográfica" sem definir a ordenação dos caracteres
+entre si. Erro meu, pego por ele, com ganho líquido.
+
 ## Li o diff?
 18/10 — AMB-004: li o diff, mas aceitei sem verificar uma afirmação factual
 sobre o conteúdo do despesas-exemplo.json. Custou um raciocínio errado que

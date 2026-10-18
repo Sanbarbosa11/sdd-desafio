@@ -10,6 +10,66 @@ Ordem cronológica inversa: a mais recente primeiro.
 
 ---
 
+## D-007 — Contrato de entrada e saída declarados na §4; validação estendida · `2026-10-18`
+
+**Gatilho:** a redação da §4 resolveu a pendência "Contrato de entrada e
+representação de erros" da §10, introduziu a AMB-019 (identificador
+repetido) e fixou casos de validação que a RN-010 não cobria.
+
+**O que mudou na spec:**
+- §4: de modelo vazio para a declaração da entrada (informações do lote e de
+  cada despesa, obrigatoriedade, lote inválido, despesa inválida) e da saída
+  (informação por despesa com a regra que a exige, consolidado, lote
+  rejeitado, exemplo).
+- RN-010, Regra: erro de lote passa a incluir data de início ou fim ausente
+  ou inválida, despesas não informadas e identificador repetido (RN-012), e a
+  saída informa todas as causas detectáveis; de "arquivo malformado" para "a
+  entrada não pode ser lida". Erro de item passa a incluir explicitamente a
+  indicação de nota fiscal ausente e o texto obrigatório vazio após remoção
+  de espaços. Acrescentados: lote sem despesas é válido; período de um dia é
+  válido; informações não previstas são ignoradas. Origem: acrescentadas a
+  AMB-019 e a §4.1. Depende de: de "§4 (contrato de entrada), pendente" para
+  "RN-012; §4.1". Aceite: acrescentados seis casos.
+- AMB-017: de "Em aberto: contrato de entrada da §4, registrado na §10" para
+  "Contrato de entrada: declarado na §4.1". Decisão, item 1: de "ou arquivo
+  malformado" para "ou a entrada não pode ser lida, entre outras causas
+  declaradas na RN-010", para que quem lesse apenas a AMB-017 não
+  implementasse um conjunto menor de causas de erro de lote.
+- §6: removido o comentário de modelo que pedia ao menos oito ambiguidades e
+  citava o nome do arquivo de exemplo.
+- §10: removido o item "Contrato de entrada e representação de erros",
+  resolvido pela §4.
+- RN-009, Regra: de "ordem lexicográfica, caractere a caractere, sem
+  extração de número" para "… pelos códigos dos caracteres, sem extração de
+  número e sem normalização de caixa: letras maiúsculas precedem as
+  minúsculas". Aceite: acrescentado "entre d-006 e D-006, mantém-se D-006".
+- AMB-011, Decisão: de "a despesa de menor identificador" para "… — na
+  ordem dos códigos dos caracteres, comparados um a um (RN-009) —".
+  Justificativa: acrescentado o motivo da ordenação pelos códigos dos
+  caracteres.
+- RN-012, Aceite: de "d-006 e D-006 → distintos; esta regra não produz erro"
+  para a mesma afirmação acrescida da assimetria — "ainda que categoria e
+  fornecedor sejam normalizados (RN-008) — normaliza-se o que é termo de
+  negócio, não o que é chave".
+
+**Por quê:** a spec descreve o estado atual do sistema. A RN-010 dependia de
+um contrato que não existia, e a §10 registrava como pendente o que a §4
+agora declara. Quanto à ordenação dos identificadores: "ordem lexicográfica,
+caractere a caractere" não dizia como os caracteres se ordenam entre si; a
+ordenação pelos códigos dos caracteres é a única que produz resultado
+determinístico independentemente de configuração regional ou de convenção
+alfabética local, e uma ordenação que ignore a caixa deixaria "d-006" e
+"D-006" empatados, sem critério de desempate — a independência de ordem
+exigida pela RN-001 só se garante com um critério total.
+
+**O que isso invalidou:** nenhum critério de aceite.
+
+**Tasks afetadas:** nenhuma — tasks.md ainda não foi escrito.
+
+**Custo:** 1 arquivo, correção pontual.
+
+---
+
 ## D-006 — Referências à normalização monetária e ordem da etapa 0 após AMB-014 e 015 · `2026-10-18`
 
 **Gatilho:** a decisão de precisão monetária (AMB-014) resolveu uma

@@ -34,19 +34,112 @@ e impede você de mover a trave depois.>
 
 ## 4. Entrada e saída
 
-**Entrada:** conforme `exemplos/despesas-exemplo.json`. Campos e significado:
+Esta seção descreve a informação que entra e a que sai, e por que cada uma é
+necessária. A forma como essa informação é representada pertence ao plan.md.
 
-| Campo | Tipo | Significado | Obrigatório |
-|---|---|---|---|
-| | | | |
+### 4.1 Entrada
 
-**Saída:** definida por mim. Estrutura e significado de cada campo:
+A entrada é um **lote**: as despesas de um colaborador em um período.
 
-| Campo | Tipo | Significado |
+**Informações do lote**
+
+| Informação | Tipo | Significado | Obrigatória | Origem |
+|---|---|---|---|---|
+| Identificador do colaborador | texto | Quem apresenta o lote | não | AMB-015 |
+| Nome do colaborador | texto | Idem | não | AMB-015 |
+| Centro de custo do colaborador | texto | Alocação contábil; sem efeito no cálculo | não | AMB-015 |
+| Data de início do período | data (dia, sem hora) | Primeiro dia da competência, incluído | **sim** | RN-005 |
+| Data de fim do período | data (dia, sem hora) | Último dia da competência, incluído | **sim** | RN-005 |
+| Rótulo de competência | texto (ano e mês) | Informativo; não participa da avaliação | não | AMB-015, AMB-016 |
+| Despesas do lote | zero ou mais despesas | O que será avaliado; um lote sem nenhuma despesa é válido | **sim** | RN-010 |
+
+**Informações de cada despesa**
+
+| Informação | Tipo | Significado | Obrigatória | Origem |
+|---|---|---|---|---|
+| Identificador | texto | Identifica a despesa; único no lote; desempata duplicatas em ordem lexicográfica | **sim** | RN-009, RN-012 |
+| Data | data (dia, sem hora) | Dia em que a despesa ocorreu; decide a pertinência ao período | **sim** | RN-005 |
+| Categoria | texto | Comparada após normalização; qualquer texto é aceito, e categoria fora das três elegíveis é recusa, não erro | **sim** | RN-008, AMB-017 |
+| Descrição | texto | Não é interpretada | não | AMB-015 |
+| Fornecedor | texto | Chave de comparação da duplicidade, após normalização; não é interpretado | **sim** | RN-009, AMB-015 |
+| Valor | número decimal | Valor lançado; normalizado para centavos antes de qualquer regra; após normalização, deve ser maior que zero | **sim** | RN-010, RN-011 |
+| Nota fiscal apresentada | sim ou não | Se a despesa tem comprovante fiscal | **sim** | RN-003, RN-010 |
+
+Um texto obrigatório que fique vazio após a remoção de espaços nas
+extremidades é tratado como ausente. Informações não previstas nesta seção
+são aceitas e ignoradas (AMB-015).
+
+**Lote inválido (erro de lote, RN-010 e RN-012).** O lote inteiro é
+rejeitado, sem que nenhuma despesa seja avaliada, quando: a entrada não pode
+ser lida; o período está ausente; a data de início ou a de fim está ausente
+ou não é data válida; a data de início é posterior à de fim; as despesas do
+lote não são informadas; ou duas ou mais despesas têm o mesmo identificador.
+Uma data de início igual à de fim é válida: o período tem um dia.
+
+**Despesa inválida (erro de item, RN-010).** Uma despesa é classificada como
+erro quando lhe falta informação obrigatória, quando uma informação tem tipo
+incompatível — valor que não é número, indicação de nota fiscal que não é sim
+ou não —, quando a data não existe no calendário, ou quando o valor
+normalizado é menor ou igual a zero.
+
+### 4.2 Saída
+
+**Por despesa.** Cada despesa da entrada aparece exatamente uma vez na saída,
+na ordem em que foi apresentada. A independência de ordem garantida pela
+RN-001 e pela RN-009 é dos resultados de cada despesa, não da sequência de
+apresentação.
+
+| Informação | Quando aparece | Por que existe (regra que a exige) |
 |---|---|---|
-| | | |
+| Identificador | sempre | Relaciona o resultado à despesa que o originou; todo aceite desta spec se refere à despesa por ele (RN-009, RN-012) |
+| Classificação: integral, parcial, recusada ou erro | sempre | RN-002 (integral, parcial), RN-007 (os quatro valores), RN-010 (erro) |
+| Valor considerado: o valor após normalização | sempre que o valor da entrada for numérico; ausente apenas quando a informação falta ou tem tipo incompatível | RN-011 ("é também o valor apresentado na saída"); permite verificar a fronteira da nota fiscal (RN-003) e o arredondamento de d-011 |
+| Categoria considerada: a categoria após normalização | sempre que a categoria for informada como texto; ausente apenas quando falta ou tem tipo incompatível | RN-008; permite verificar que "ALIMENTACAO" em d-014 foi tratada como alimentacao |
+| Valor reembolsado | sempre; 0,00 em recusa e em erro | RN-002, RN-004, RN-006, RN-008, RN-009, RN-010 |
+| Limite aplicado | integral e parcial | RN-001, RN-002; sem ele, aceites como "d-011 → limite 60,00" (AMB-007) e "d-010 → limite 250,00" (AMB-009) não são verificáveis, pois o valor reembolsado de d-011 é o mesmo com qualquer limite acima de 33,33 |
+| Excedente não reembolsado | parcial | RN-002, cujos aceites declaram o excedente |
+| Exigência de nota fiscal: exigida ou não exigida | integral, parcial e recusada | RN-003; "d-003 → nota fiscal não exigida" e "transporte de 100,01 com NF → exigida e presente" produzem o mesmo reembolso, e sem esta informação os dois aceites não se distinguem |
+| Lista de motivos de recusa, na ordem da §8 | sempre; vazia em integral, parcial e erro | RN-007, AMB-018 |
+| Despesa mantida: o identificador da despesa que permaneceu com o reembolso | quando a lista de motivos contém DUPLICATA | RN-009; permite verificar qual despesa do grupo foi mantida e que inverter a ordem da entrada não a altera |
+| Causa do erro: qual informação falhou e de que forma — ausente, tipo incompatível, data inexistente ou valor não positivo | erro | RN-010, AMB-017; separada da lista de motivos, porque erro não é recusa (RN-007) |
 
-<Cole um exemplo de saída para uma entrada pequena. Vale mais que três parágrafos.>
+Esses campos, em conjunto, são a justificativa de cada despesa: respondem por
+que ela recebeu o que recebeu. Uma frase legível construída a partir deles é
+apresentação, e pertence ao plan.md.
+
+Não aparecem na saída o identificador, o nome e o centro de custo do
+colaborador, o rótulo de competência e a descrição das despesas: são
+informações que nenhuma regra utiliza (AMB-015).
+
+**Consolidado do lote.**
+
+| Informação | Por que existe |
+|---|---|
+| Período avaliado: datas de início e de fim | Mostra contra qual intervalo a pertinência foi julgada (RN-005) |
+| Total reembolsado: soma dos valores reembolsados de todas as despesas | É o que o motor existe para determinar; confere com a soma dos itens porque cada valor já está em centavos (AMB-014) |
+| Quantidade de despesas por classificação — integral, parcial, recusada, erro — e quantidade total | Prova que nenhuma despesa foi omitida: a quantidade total é igual à de despesas da entrada (AMB-010) |
+
+Um lote sem despesas produz total reembolsado 0,00 e quantidade zero em todas
+as classificações.
+
+**Lote rejeitado.** A saída informa que o lote foi rejeitado e todas as
+causas de erro de lote detectáveis, não apenas a primeira, pelo mesmo
+princípio da AMB-018; a entrada que não pode ser lida é a exceção, por
+impedir a detecção das demais. Não há resultado por despesa nem consolidado:
+um total de 0,00 seria confundido com um lote avaliado em que nada foi
+reembolsado.
+
+**Exemplo.** Lote de 01/07 a 31/07 com d-001, d-006, d-007 e d-009:
+
+| Despesa | Classificação | Valor considerado | Categoria considerada | Limite | Reembolsado | Excedente | Nota fiscal | Motivos | Outras |
+|---|---|---|---|---|---|---|---|---|---|
+| d-001 (alimentação, 72,50, com NF) | parcial | 72,50 | alimentacao | 60,00 | 60,00 | 12,50 | não exigida | nenhum | — |
+| d-006 (alimentação, Bistro Central, 54,90, com NF) | integral | 54,90 | alimentacao | 60,00 | 54,90 | — | não exigida | nenhum | — |
+| d-007 (idêntica a d-006) | recusada | 54,90 | alimentacao | — | 0,00 | — | não exigida | DUPLICATA | despesa mantida: d-006 |
+| d-009 (transporte urbano, −45,00, sem NF) | erro | −45,00 | transporte_urbano | — | 0,00 | — | — | nenhum | causa: valor não positivo |
+
+Consolidado: período de 01/07 a 31/07; total reembolsado 114,90; 1 integral,
+1 parcial, 1 recusada, 1 erro; 4 despesas.
 
 ## 5. Regras de negócio
 
@@ -264,9 +357,10 @@ erro de item nunca é mantida nem recusada como duplicata. Dentro de um grupo,
 a despesa de menor identificador é avaliada normalmente e as demais são
 recusadas, com o motivo DUPLICATA na sua lista de motivos (RN-007). Os
 identificadores são comparados em ordem lexicográfica, caractere a
-caractere, sem extração de número; com identificadores de larguras
-diferentes, "d-10" precede "d-9". O resultado não depende da ordem das
-despesas na entrada.
+caractere, pelos códigos dos caracteres, sem extração de número e sem
+normalização de caixa: letras maiúsculas precedem as minúsculas, e, com
+identificadores de larguras diferentes, "d-10" precede "d-9". O resultado
+não depende da ordem das despesas na entrada.
 **Origem:** política do RH, item 8; decisão AMB-011
 **Depende de:** RN-007 (lista de motivos); RN-008 (categoria e fornecedor
 normalizados); RN-011 (valor normalizado).
@@ -294,23 +388,32 @@ normalizados); RN-011 (valor normalizado).
   motivos [DUPLICATA].
 - Duas despesas iguais no critério, com fornecedores "Bistro Central" e
   "BISTRO CENTRAL" → grupo de duplicatas.
+- Duas despesas iguais no critério, com identificadores "d-006" e "D-006" →
+  grupo de duplicatas; mantém-se "D-006", que precede "d-006" pela ordem dos
+  códigos dos caracteres; "d-006" → motivos [DUPLICATA].
 
 ### RN-010 — Validação da entrada: erro de lote e erro de item
 
 **Regra:** antes de qualquer regra de elegibilidade ou de valor, a entrada é
-validada contra o contrato de entrada declarado na §4. Distinguem-se três
+validada contra o contrato de entrada declarado na §4.1. Distinguem-se três
 situações:
 
-1. **Erro de lote** — a estrutura da entrada impede qualquer avaliação: data
-   de início posterior à data de fim, período ausente, ou arquivo malformado.
-   Nenhuma despesa é processada e o lote é rejeitado.
-2. **Erro de item** — uma despesa não pode ser avaliada por campo obrigatório
-   ausente, tipo incompatível, data inválida ou valor normalizado (RN-011)
-   menor ou igual a zero. A despesa é classificada como erro, com reembolso
-   0,00, e não é avaliada por nenhuma regra de elegibilidade ou de valor;
-   não integra grupo de
-   duplicatas (RN-009). As demais despesas do lote são processadas
-   normalmente.
+1. **Erro de lote** — a estrutura da entrada impede qualquer avaliação: a
+   entrada não pode ser lida; o período está ausente; a data de início ou a
+   de fim está ausente ou não é data válida; a data de início é posterior à
+   de fim; as despesas do lote não são informadas; ou há identificador de
+   despesa repetido (RN-012). Nenhuma despesa é processada e o lote é
+   rejeitado. A saída informa todas as causas de erro de lote detectáveis;
+   a entrada que não pode ser lida é a exceção, por impedir a detecção das
+   demais.
+2. **Erro de item** — uma despesa não pode ser avaliada por informação
+   obrigatória ausente — inclusive a indicação de nota fiscal —, tipo
+   incompatível, data inexistente no calendário ou valor normalizado
+   (RN-011) menor ou igual a zero. Um texto obrigatório que fique vazio após
+   a remoção de espaços nas extremidades é tratado como ausente. A despesa é
+   classificada como erro, com reembolso 0,00, e não é avaliada por nenhuma
+   regra de elegibilidade ou de valor; não integra grupo de duplicatas
+   (RN-009). As demais despesas do lote são processadas normalmente.
 3. **Recusa** — a despesa é bem formada e uma regra de elegibilidade a
    rejeita (RN-004, RN-006, RN-008, RN-009). Recebe a classificação recusada,
    com seus motivos (RN-007).
@@ -319,9 +422,13 @@ Os valores monetários aceitos são estritamente maiores que zero; um valor
 igual ou inferior a zero constitui erro de item. A faixa é avaliada sobre o
 valor já normalizado para duas casas decimais (RN-011), e não sobre o valor
 escrito na entrada.
-**Origem:** decisões AMB-014 e AMB-017
-**Depende de:** RN-011 (normalização monetária); §4 (contrato de entrada),
-pendente — ver §10.
+
+Um lote sem nenhuma despesa é válido. Um período cuja data de início é igual
+à de fim é válido e tem um dia. Informações não previstas no contrato de
+entrada são aceitas e ignoradas.
+**Origem:** decisões AMB-014, AMB-017 e AMB-019; §4.1
+**Depende de:** RN-011 (normalização monetária); RN-012 (unicidade do
+identificador); §4.1 (contrato de entrada).
 **Aceite:**
 - d-009 (11/07, transporte urbano, −45,00, sem NF) → erro de item; reembolso
   0,00; não é avaliada por nenhuma regra de elegibilidade.
@@ -333,7 +440,37 @@ pendente — ver §10.
   processadas.
 - Despesa de valor 0,00 → erro de item.
 - Despesa de valor 0,004 → valor normalizado 0,00; erro de item.
+- Despesa sem a indicação de nota fiscal → erro de item; não é recusada por
+  SEM_NOTA_FISCAL.
+- Despesa com fornecedor formado apenas por espaços → erro de item
+  (informação obrigatória ausente).
+- Despesa com data 2026-02-30 → erro de item (data inexistente).
+- Lote sem nenhuma despesa → válido; total reembolsado 0,00; quantidade zero
+  em todas as classificações.
+- Período com data de início igual à de fim → válido.
+- Lote com data de início posterior à de fim e com identificador repetido →
+  lote rejeitado; a saída informa as duas causas.
 - Um erro de item em uma despesa não altera o resultado de nenhuma outra.
+
+### RN-012 — Unicidade do identificador de despesa
+
+**Regra:** cada despesa do lote tem identificador único. Duas ou mais despesas
+com o mesmo identificador constituem erro de lote (RN-010): o lote é
+rejeitado e nenhuma despesa é avaliada, inclusive as que têm identificador
+único. Os identificadores são comparados exatamente como informados, após a
+remoção de espaços nas extremidades.
+**Origem:** decisão AMB-019
+**Depende de:** RN-010 (erro de lote).
+**Aceite:**
+- Lote com duas despesas de identificador d-006 → lote rejeitado; causa:
+  identificador repetido; nenhuma despesa é avaliada.
+- Lote de exemplo, com identificadores d-001 a d-014, todos distintos → esta
+  regra não produz erro.
+- "d-006" e "D-006" → identificadores distintos; esta regra não produz erro de
+  lote, ainda que categoria e fornecedor sejam normalizados (RN-008) —
+  normaliza-se o que é termo de negócio, não o que é chave.
+
+---
 
 ### RN-011 — Normalização monetária
 
@@ -794,7 +931,8 @@ sistema faz com um grupo de duplicatas.
 coincidem em data, categoria normalizada (AMB-013), fornecedor normalizado
 (AMB-013) e valor normalizado (AMB-014). A descrição e a presença de nota
 fiscal não integram o critério. Dentro de um grupo, a despesa de menor
-identificador é avaliada normalmente e as demais são recusadas, com o motivo
+identificador — na ordem dos códigos dos caracteres, comparados um a um
+(RN-009) — é avaliada normalmente e as demais são recusadas, com o motivo
 DUPLICATA em sua lista de motivos. Despesas já recusadas por outra regra de
 elegibilidade não integram grupos de duplicatas.
 **Justificativa:** incluir a descrição no critério faria uma diferença de
@@ -806,7 +944,12 @@ também o lançamento legítimo, e reembolsar todas registrando um alerta
 trataria "devem ser tratadas" como recomendação — objeção já levantada na
 AMB-005. Manter a de menor identificador, e não a primeira da entrada,
 preserva o critério de aceite da RN-001, segundo o qual inverter a ordem das
-despesas na entrada não altera nenhum resultado.
+despesas na entrada não altera nenhum resultado. A ordenação pelos códigos
+dos caracteres é a única que produz resultado determinístico
+independentemente de configuração regional ou de convenção alfabética local;
+uma ordenação que ignore a caixa deixaria "d-006" e "D-006" empatados, sem
+critério de desempate, e a independência de ordem exigida pela RN-001 só se
+garante com um critério total.
 **Custo aceito:** duas despesas legítimas de mesmo valor, no mesmo fornecedor e
 na mesma data — dois almoços de equipe no mesmo restaurante, por exemplo —
 são tratadas como duplicata, e a segunda é recusada. A duplicidade é
@@ -1060,8 +1203,9 @@ motivo, exceto o que impeça o processamento do lote.
 **Decisão:** adotado o critério estrutural (a). Distinguem-se três situações:
 
 1. Erro de lote — a estrutura da entrada impede qualquer avaliação: data de
-   início posterior à data de fim, período ausente, ou arquivo malformado.
-   Nenhuma despesa é processada e o lote é rejeitado.
+   início posterior à data de fim, período ausente, ou a entrada não pode ser
+   lida, entre outras causas declaradas na RN-010. Nenhuma despesa é
+   processada e o lote é rejeitado.
 2. Erro de item — uma despesa não pode ser avaliada por campo obrigatório
    ausente, tipo incompatível, data inválida ou valor normalizado (AMB-014)
    menor ou igual a zero. A despesa recebe a classificação erro, com
@@ -1103,7 +1247,7 @@ produziria resultado que ninguém consegue justificar.
   lote são processadas
 - um erro de item em uma despesa não impede o processamento das demais
 
-**Em aberto:** contrato de entrada da §4, registrado na §10.
+**Contrato de entrada:** declarado na §4.1.
 **Regra afetada:** RN-010; RN-007 (quarto valor de classificação); RN-009
 (despesa com erro não integra grupo)
 
@@ -1139,8 +1283,35 @@ para que o resultado seja determinístico.
 
 **Regra afetada:** RN-004, RN-006, RN-007; §8
 
-<A política tem no mínimo oito. Se você achou menos, releia
-`exemplos/despesas-exemplo.json` — cada item daquele arquivo existe por um motivo.>
+### AMB-019 — Identificador de despesa repetido no lote
+
+**Texto original do RH:** não há. A política não trata da identificação das
+despesas; a dúvida surgiu ao declarar o contrato de entrada (§4.1).
+**O que não está claro:** o que acontece quando duas ou mais despesas do lote
+têm o mesmo identificador. As leituras consideradas foram: (a) erro de lote;
+(b) erro de item nas despesas que compartilham o identificador, processando
+as demais.
+**Decisão:** adotada a leitura (a). Identificador de despesa repetido
+constitui erro de lote: o lote é rejeitado e nenhuma despesa é avaliada.
+**Justificativa:** o problema não está numa despesa específica, mas na
+integridade do lote: com identificadores repetidos não há como relacionar
+cada resultado da saída à despesa que o originou, e o desempate da RN-009,
+que mantém a despesa de menor identificador, perde o critério. Tratar como
+erro de item nas duas despesas deixaria o restante do lote processado
+produzindo uma saída ambígua.
+**Custo aceito:** um identificador repetido por engano bloqueia o lote inteiro,
+inclusive as despesas corretas, que só serão avaliadas quando o lote for
+reapresentado com identificadores únicos.
+**Consequências verificáveis:**
+- um lote com duas despesas de identificador d-006 → lote rejeitado, causa
+  identificador repetido; nenhuma despesa avaliada, nem as de identificador
+  único
+- o lote de exemplo, com d-001 a d-014 distintos, não é afetado por esta
+  decisão
+- um lote com identificador repetido e data de início posterior à de fim →
+  lote rejeitado, com as duas causas informadas
+
+**Regra afetada:** RN-012; RN-010 (nova causa de erro de lote)
 
 ---
 
@@ -1242,12 +1413,3 @@ O sistema está pronto quando:
   pelo processo que autoriza a viagem — não pelo colaborador que lança a
   despesa. Enquanto isso não existir, colaboradores em viagem recebem menos
   do que a política lhes garante, e a regularização cabe ao financeiro.
-- **Contrato de entrada e representação de erros (origem: AMB-017).** A §4
-  precisa declarar os campos obrigatórios, seus tipos e faixas admitidas, sem
-  o que a RN-010 não é verificável. Precisa também definir como a saída
-  representa uma despesa com erro de item — em particular, se e como informa
-  qual campo falhou — e o que a saída contém quando o lote é rejeitado por
-  erro de lote. Já decidido: os campos sem regra associada — identificador,
-  nome e centro de custo do colaborador, rótulo de competência e descrição —
-  são opcionais, e o fornecedor é obrigatório (AMB-015). O restante está
-  pendente até a redação da §4.
