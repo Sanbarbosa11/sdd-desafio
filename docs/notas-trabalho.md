@@ -78,6 +78,14 @@ e d-013 também se a AMB-009 contar 1 diária. A AMB-006 decide d-004 entre
 0,00 e 80,00. Não detectei por conta própria — aceitei a afirmação dele sem
 cruzar com os números do JSON.
 
+18/10 — AMB-015: a redação que eu passei colocava o fornecedor na lista de
+campos "que nenhuma regra utiliza", mas a frase seguinte declarava todos os
+campos da lista como opcionais — o que deixaria a RN-009 sem chave de
+comparação quando o fornecedor faltasse. Eu tinha levantado a dúvida no
+próprio pedido, mas a redação que propus não a resolvia. Ele apontou a
+contradição e separou "campo não utilizado" de "campo usado apenas como
+chave, sem interpretação do conteúdo". Erro meu, pego por ele.
+
 ## Li o diff?
 18/10 — AMB-004: li o diff, mas aceitei sem verificar uma afirmação factual
 sobre o conteúdo do despesas-exemplo.json. Custou um raciocínio errado que
