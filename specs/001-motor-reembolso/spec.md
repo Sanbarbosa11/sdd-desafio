@@ -166,8 +166,9 @@ interpretada. Uma despesa fora do período é recusada conforme a RN-006.
 - Despesa em 2026-08-01 → fora do período.
 - d-008 (15/04, "Almoco de abril lancado com atraso") → fora do período; a
   descrição não altera o resultado.
-- d-001 a d-007 e d-009 a d-013 (datas entre 03/07 e 22/07) → dentro do
-  período.
+- d-001 a d-007 e d-010 a d-013 (datas entre 03/07 e 22/07) → dentro do
+  período. d-009 (11/07) é erro de item e não é avaliada por esta regra
+  (RN-010).
 
 ### RN-006 — Recusa por despesa fora do período
 
@@ -191,15 +192,18 @@ outras despesas.
 
 **Regra:** a saída de cada despesa traz a lista de todos os motivos de recusa
 aplicáveis, e não um motivo único. Todas as regras de elegibilidade são
-avaliadas para toda despesa, sem interrupção na primeira que se aplica, e cada
-uma que se aplica acrescenta seu motivo à lista. Se a lista contém qualquer
-motivo, a despesa é recusada com reembolso 0,00 e não é avaliada contra o
-limite. Se a lista está vazia, a despesa segue para o limite da categoria e é
-classificada como integral ou parcial conforme a RN-002; o reembolso parcial
-não é motivo de recusa e não entra na lista. A lista é ordenada na ordem das
-regras de elegibilidade declarada na §8, de modo que a mesma entrada produza
-sempre a mesma saída.
-**Origem:** decisão AMB-018
+avaliadas para toda despesa sem erro de item (RN-010), sem interrupção na
+primeira que se aplica, e cada uma que se aplica acrescenta seu motivo à
+lista. Se a lista contém qualquer motivo, a despesa é recusada com reembolso
+0,00 e não é avaliada contra o limite. Se a lista está vazia, a despesa segue
+para o limite da categoria e é classificada como integral ou parcial conforme
+a RN-002; o reembolso parcial não é motivo de recusa e não entra na lista. A
+lista é ordenada na ordem das regras de elegibilidade declarada na §8, de
+modo que a mesma entrada produza sempre a mesma saída. A classificação de
+cada despesa assume um de quatro valores: integral, parcial, recusada ou
+erro. Uma despesa com erro de item é classificada como erro e tem a lista de
+motivos de recusa vazia: erro não é recusa (RN-010).
+**Origem:** decisões AMB-017 e AMB-018
 **Depende de:** §8 (ordem das regras de elegibilidade).
 **Aceite:**
 - Despesa de 150,00, sem NF, com data fora do período → reembolso 0,00,
@@ -209,6 +213,113 @@ sempre a mesma saída.
 - Despesa sem nenhuma violação (por exemplo, d-002) → lista de motivos vazia.
 - d-001 (72,50, acima do limite) → reembolso 60,00, parcial; lista de motivos
   vazia.
+- d-009 (−45,00) → classificação erro; reembolso 0,00; lista de motivos de
+  recusa vazia.
+
+### RN-008 — Normalização de categoria e fornecedor; elegibilidade da categoria
+
+**Regra:** antes de qualquer comparação, a categoria e o fornecedor de cada
+despesa são normalizados: letras maiúsculas são convertidas em minúsculas e
+espaços nas extremidades são removidos. Nenhuma outra transformação é
+aplicada — acentuação, separadores e sinônimos não são normalizados. Toda
+regra que compara categorias ou fornecedores usa os valores normalizados.
+As categorias elegíveis são
+exatamente três: alimentacao, transporte_urbano e hospedagem. Uma despesa
+cuja categoria normalizada seja qualquer outra é recusada, com o motivo
+CATEGORIA_INELEGIVEL na sua lista de motivos (RN-007).
+**Origem:** política do RH, item 9; decisão AMB-013
+**Depende de:** RN-007 (lista de motivos).
+**Aceite:**
+- d-014 ("ALIMENTACAO", 61,00, com NF, 31/07) → categoria normalizada
+  alimentacao; reembolso 60,00, parcial; lista de motivos vazia.
+- d-005 ("coworking", 89,00, com NF) → reembolso 0,00, recusado, motivos
+  [CATEGORIA_INELEGIVEL].
+- "Alimentacao", "ALIMENTACAO" e " alimentacao " → a mesma categoria,
+  alimentacao.
+- "alimentação", com cedilha e til → não normalizada; recusada, motivos
+  [CATEGORIA_INELEGIVEL].
+- "transporte-urbano" → não normalizado para transporte_urbano; recusado,
+  motivos [CATEGORIA_INELEGIVEL].
+- Fornecedores "Bistro Central", "BISTRO CENTRAL" e " Bistro Central " → o
+  mesmo fornecedor; "Bistrô Central" → fornecedor distinto.
+
+### RN-009 — Duplicidade
+
+**Regra:** duas ou mais despesas formam um grupo de duplicatas quando
+coincidem em data, categoria normalizada (RN-008), fornecedor normalizado
+(RN-008) e valor normalizado (AMB-014). A descrição e a presença de nota
+fiscal não integram o critério. Só integram grupos as despesas que não receberam motivo de nenhuma
+outra regra de elegibilidade e que não têm erro de item (RN-010): uma despesa
+fora do período, de categoria inelegível, sem a nota fiscal exigida ou com
+erro de item nunca é mantida nem recusada como duplicata. Dentro de um grupo,
+a despesa de menor identificador é avaliada normalmente e as demais são
+recusadas, com o motivo DUPLICATA na sua lista de motivos (RN-007). Os
+identificadores são comparados em ordem lexicográfica, caractere a
+caractere, sem extração de número; com identificadores de larguras
+diferentes, "d-10" precede "d-9". O resultado não depende da ordem das
+despesas na entrada.
+**Origem:** política do RH, item 8; decisão AMB-011
+**Depende de:** RN-007 (lista de motivos); RN-008 (categoria normalizada);
+AMB-014 (valor normalizado), pendente.
+**Aceite:**
+- d-006 e d-007 (09/07, alimentação, Bistro Central, 54,90, com NF) → grupo de
+  duplicatas; d-006 → reembolso 54,90, integral, lista de motivos vazia;
+  d-007 → reembolso 0,00, recusado, motivos [DUPLICATA].
+- Inverter a ordem de d-006 e d-007 na entrada → os mesmos dois resultados.
+- Duas despesas iguais no critério, de valor até 100,00 (nota não exigida),
+  uma com NF e outra sem → mesmo grupo; a de menor identificador é mantida,
+  qualquer que seja a que tem a nota.
+- Duas hospedagens iguais no critério, de 200,00, a de menor identificador
+  sem NF e a outra com NF → a sem NF é recusada, motivos [SEM_NOTA_FISCAL], e
+  não integra grupo; a com NF → reembolso 200,00, integral, sem DUPLICATA.
+- Duas despesas iguais no critério, com descrições diferentes → grupo de
+  duplicatas.
+- Duas despesas iguais no critério, ambas fora do período → ambas recusadas,
+  motivos [FORA_DA_COMPETENCIA]; nenhuma recebe DUPLICATA.
+- Duas diárias no mesmo hotel, 240,00 cada, com NF, lançadas com as datas de
+  cada noite (14/07 e 15/07) → não são duplicatas; reembolso 240,00, integral,
+  cada uma. As mesmas duas lançadas ambas em 14/07 → grupo de duplicatas; a
+  de menor identificador → 240,00, integral; a outra → motivos [DUPLICATA].
+- Duas despesas iguais no critério, com identificadores "d-9" e "d-10" → "d-10"
+  é a de menor identificador (ordem lexicográfica) e é mantida; "d-9" →
+  motivos [DUPLICATA].
+- Duas despesas iguais no critério, com fornecedores "Bistro Central" e
+  "BISTRO CENTRAL" → grupo de duplicatas.
+
+### RN-010 — Validação da entrada: erro de lote e erro de item
+
+**Regra:** antes de qualquer regra de elegibilidade ou de valor, a entrada é
+validada contra o contrato de entrada declarado na §4. Distinguem-se três
+situações:
+
+1. **Erro de lote** — a estrutura da entrada impede qualquer avaliação: data
+   de início posterior à data de fim, período ausente, ou arquivo malformado.
+   Nenhuma despesa é processada e o lote é rejeitado.
+2. **Erro de item** — uma despesa não pode ser avaliada por campo obrigatório
+   ausente, tipo incompatível, data inválida ou valor menor ou igual a zero.
+   A despesa é classificada como erro, com reembolso 0,00, e não é avaliada
+   por nenhuma regra de elegibilidade ou de valor; não integra grupo de
+   duplicatas (RN-009). As demais despesas do lote são processadas
+   normalmente.
+3. **Recusa** — a despesa é bem formada e uma regra de elegibilidade a
+   rejeita (RN-004, RN-006, RN-008, RN-009). Recebe a classificação recusada,
+   com seus motivos (RN-007).
+
+Os valores monetários aceitos são estritamente maiores que zero; um valor
+igual ou inferior a zero constitui erro de item.
+**Origem:** decisão AMB-017
+**Depende de:** §4 (contrato de entrada), pendente — ver §10.
+**Aceite:**
+- d-009 (11/07, transporte urbano, −45,00, sem NF) → erro de item; reembolso
+  0,00; não é avaliada por nenhuma regra de elegibilidade.
+- d-005 (coworking, 89,00) → bem formada; recusada, motivos
+  [CATEGORIA_INELEGIVEL]; não é erro.
+- Entrada com data de início posterior à data de fim → lote rejeitado;
+  nenhuma despesa processada.
+- Despesa sem o campo de valor → erro de item; as demais despesas do lote são
+  processadas.
+- Despesa de valor 0,00 → erro de item.
+- Um erro de item em uma despesa não altera o resultado de nenhuma outra.
 
 ---
 
@@ -244,8 +355,8 @@ o excedente é cortado):
 - d-001 (alimentação, 72,50) → reembolso 60,00, parcial
 - d-002 (alimentação, 38,00) → reembolso 38,00, integral
 - dia 03/07 totaliza 98,00
-- d-006 e d-007 (54,90 cada) deixam de competir pelo limite; o tratamento
-  passa a depender apenas da regra de duplicata (AMB-011)
+- d-006 e d-007 (54,90 cada) deixam de competir pelo limite; d-006 → 54,90,
+  integral; d-007 → 0,00, recusado, motivos [DUPLICATA] (RN-009)
 - a AMB-003 (qual item do dia sofre o corte) deixa de existir
 
 **Em aberto:** registrado na §10.
@@ -272,7 +383,8 @@ a gastar acima dele, já que o colaborador sempre recebe o teto. Aceito porque
 a alternativa pune desvio mínimo de forma desproporcional.
 **Consequências verificáveis:**
 - d-001 (72,50, limite 60) → 60,00, parcial
-- d-014 (61,00, limite 60) → 60,00, parcial (condicionado à AMB-013)
+- d-014 (61,00, "ALIMENTACAO", limite 60) → 60,00, parcial; a categoria é
+  normalizada para alimentacao (RN-008)
 - d-003 (100,00, limite 80) → 80,00, parcial; a nota fiscal não é exigida (RN-003)
 - uma despesa de exatamente 60,00 em alimentação → 60,00, integral
 - a RN-001 e seus aceites permanecem válidos sem alteração
@@ -358,7 +470,7 @@ comprovante renderia R$ 60 — esvaziando a regra em alimentação e em
 transporte urbano. A leitura (d) trataria "obrigatória" como
 "recomendada" e devolveria a decisão à conferência manual. A leitura (c)
 tem mérito ao distinguir o que tem conserto do que não tem, mas exigiria um
-quarto estado e um campo de valor potencial que a política não prevê, além
+estado adicional e um campo de valor potencial que a política não prevê, além
 de abrir a questão nova de até quando a nota pode ser apresentada; o ganho
 que ela traz é capturado aqui pelo motivo estruturado, sem criar estado novo.
 **Custo aceito:** o salto na fronteira é máximo. d-003 (R$ 100,00, sem nota)
@@ -542,7 +654,8 @@ competência correta.
 **Consequências verificáveis:**
 - d-008 (15/04, lote de julho) → fora do período; reembolso 0,00, recusado,
   motivos [FORA_DA_COMPETENCIA] (RN-006)
-- as despesas entre 03/07 e 22/07 estão dentro do período
+- as despesas entre 03/07 e 22/07 estão dentro do período, exceto d-009,
+  que é erro de item e não é avaliada por esta regra (RN-010)
 - a descrição de d-008 ("Almoco de abril lancado com atraso") não é
   interpretada, em coerência com a AMB-007 e a AMB-009
 
@@ -561,8 +674,10 @@ número aparece apenas em texto livre na descrição, com redação variável �
 a entrada com um campo explícito.
 **Decisão:** adotada a leitura (a). Cada lançamento de hospedagem é avaliado
 como uma diária, e seu limite é sempre R$ 250,00. Uma estadia de várias
-noites deve ser lançada como uma despesa por diária. A descrição não é
-interpretada.
+noites deve ser lançada como uma despesa por diária, e cada lançamento de
+diária traz a data da noite a que se refere, de modo que diárias consecutivas
+tenham datas distintas e não constituam duplicata (AMB-011). A descrição não
+é interpretada.
 **Justificativa:** o número de diárias não é dado estruturado, e as demais
 leituras o produzem de formas que o motor não consegue sustentar. A leitura
 (b) faria o limite depender de texto redigido pelo próprio colaborador —
@@ -581,8 +696,8 @@ verificável: uma diária, um lançamento.
 **Custo aceito:** uma estadia lançada de forma consolidada é penalizada pela
 forma do lançamento, não pelo valor. d-010 (R$ 480,00 por duas noites,
 R$ 240,00 por noite, abaixo do limite) recebe R$ 250,00 e perde R$ 230,00 —
-sendo que as duas diárias, lançadas separadamente, seriam reembolsadas
-integralmente. A correção cabe ao processo de lançamento, não ao motor.
+sendo que as duas diárias, lançadas separadamente, cada uma com a data da sua
+noite, seriam reembolsadas integralmente. A correção cabe ao processo de lançamento, não ao motor.
 Aceito porque a alternativa é conceder limite adicional com base em
 informação que o colaborador escreve e que o sistema não tem como conferir.
 **Consequências verificáveis:**
@@ -618,7 +733,7 @@ apresentá-lo no lote da competência correta. A leitura (b) retiraria o item
 da saída, e o enunciado exige que o motor justifique cada decisão; um item
 ausente não distingue "excluído" de "esquecido". As leituras (c) e (d) foram
 rejeitadas na AMB-005 pelos mesmos motivos que valem aqui: a primeira cria um
-quarto estado e abre a questão de até quando a reapresentação é possível; a
+estado adicional e abre a questão de até quando a reapresentação é possível; a
 segunda trata uma obrigação da política como recomendação.
 **Custo aceito:** a saída passa a conter itens com reembolso zero que não
 foram avaliados contra as demais regras de valor. Aceito porque a
@@ -632,6 +747,130 @@ saída.
   comparação com outras despesas
 
 **Regra afetada:** RN-006
+
+### AMB-011 — Duplicidade: critério e tratamento
+
+**Texto original do RH:** "Duplicatas devem ser tratadas." (item 8) A política
+não define o que caracteriza uma duplicata nem o que significa tratá-la.
+**O que não está claro:** duas questões. (i) qual conjunto de campos precisa
+coincidir para que duas despesas sejam consideradas a mesma; (ii) o que o
+sistema faz com um grupo de duplicatas.
+**Decisão:** duas ou mais despesas constituem um grupo de duplicatas quando
+coincidem em data, categoria normalizada (AMB-013), fornecedor normalizado
+(AMB-013) e valor normalizado (AMB-014). A descrição e a presença de nota
+fiscal não integram o critério. Dentro de um grupo, a despesa de menor
+identificador é avaliada normalmente e as demais são recusadas, com o motivo
+DUPLICATA em sua lista de motivos. Despesas já recusadas por outra regra de
+elegibilidade não integram grupos de duplicatas.
+**Justificativa:** incluir a descrição no critério faria uma diferença de
+acentuação ou de redação desfazer a detecção, e a spec já estabeleceu que a
+descrição não é interpretada; exigir apenas o identificador repetido tornaria
+a regra inócua, já que identificadores distintos são atribuídos a cada
+lançamento. Quanto ao tratamento, recusar todas as despesas do grupo puniria
+também o lançamento legítimo, e reembolsar todas registrando um alerta
+trataria "devem ser tratadas" como recomendação — objeção já levantada na
+AMB-005. Manter a de menor identificador, e não a primeira da entrada,
+preserva o critério de aceite da RN-001, segundo o qual inverter a ordem das
+despesas na entrada não altera nenhum resultado.
+**Custo aceito:** duas despesas legítimas de mesmo valor, no mesmo fornecedor e
+na mesma data — dois almoços de equipe no mesmo restaurante, por exemplo —
+são tratadas como duplicata, e a segunda é recusada. A duplicidade é
+inferência, não fato observado: o sistema não tem como distinguir a cópia do
+lançamento genuíno. A correção cabe ao colaborador, que pode diferenciar os
+lançamentos pelo valor efetivo de cada um.
+**Consequências verificáveis:**
+- d-006 e d-007 (ambos 09/07, alimentação, Bistro Central, 54,90) formam
+  grupo de duplicatas; d-006 → reembolso 54,90, integral, lista de motivos
+  vazia; d-007 → reembolso 0,00, recusado, motivos [DUPLICATA]
+- inverter a ordem de d-006 e d-007 na entrada não altera nenhum dos dois
+  resultados
+- duas despesas iguais em todos os campos do critério, de valor até
+  R$ 100,00, uma com nota fiscal e outra sem, formam o mesmo grupo; a de
+  menor identificador é mantida, independentemente de qual delas possui a
+  nota
+- duas despesas iguais no critério, mas com descrições diferentes, formam
+  grupo de duplicatas
+- uma despesa fora do período (RN-006) não integra grupo de duplicatas, nem
+  como mantida nem como recusada
+
+**Regra afetada:** RN-009; AMB-009 (data de cada diária)
+
+### AMB-012 — Tratamento de lançamentos de valor negativo (dissolvida)
+
+**Texto original do RH:** não há; a política não menciona créditos, estornos
+ou devoluções.
+**O que não estava claro:** o arquivo de exemplo contém um lançamento de valor
+negativo descrito como estorno (d-009, −45,00), e era necessário decidir se
+ele seria ignorado, abatido do total do período, abatido do limite do dia, ou
+tratado de outra forma.
+**Decisão:** dissolvida pela AMB-017. O critério estrutural ali adotado
+estabelece que valor menor ou igual a zero constitui erro de item, de modo que
+d-009 recebe classificação erro, reembolso 0,00, e não é avaliado por nenhuma
+regra de elegibilidade ou de valor. Não resta decisão de negócio a tomar sobre
+lançamentos negativos: eles não são dado válido segundo o contrato de
+entrada.
+
+Registrada para manter a rastreabilidade da numeração e documentar que a
+questão foi identificada antes de ser eliminada.
+**Regra afetada:** nenhuma (dissolvida).
+
+### AMB-013 — Identidade e elegibilidade da categoria
+
+**Texto original do RH:** "Categorias fora da política não são reembolsáveis."
+(item 9) A política nomeia três categorias — alimentação, transporte urbano e
+hospedagem — ao estabelecer limites, e não apresenta lista de categorias
+inelegíveis.
+**O que não está claro:** duas questões. (i) se a comparação da categoria
+distingue maiúsculas de minúsculas, já que d-014 traz "ALIMENTACAO"; (ii) se
+as três categorias nomeadas esgotam as elegíveis, ou se são apenas aquelas
+que possuem limite, podendo haver outras elegíveis sem teto.
+**Decisão:** a categoria é normalizada antes da comparação, convertendo-se
+maiúsculas em minúsculas e removendo-se espaços nas extremidades. Nenhuma
+outra transformação é aplicada: acentuação, separadores e sinônimos não são
+normalizados. As categorias elegíveis são exatamente três — alimentação,
+transporte urbano e hospedagem. Qualquer outra categoria é inelegível, e a
+despesa é recusada com o motivo CATEGORIA_INELEGIVEL em sua lista de motivos.
+**Justificativa:** a categoria é campo estruturado com vocabulário fechado, e
+uniformizar a caixa não constitui interpretação de texto livre — distingue-se,
+nesse ponto, do que a AMB-007 e a AMB-009 recusaram. Tratar "ALIMENTACAO"
+como categoria distinta faria d-014 perder os R$ 61,00 integrais por uma
+diferença de grafia, o mesmo tipo de desproporção que a AMB-002 rejeitou ao
+decidir o reembolso parcial. O alcance da normalização é mantido estreito
+justamente para que a fronteira permaneça verificável: cada transformação
+adicional aproximaria a regra da inferência. Quanto à segunda questão, admitir
+categorias elegíveis fora das três esvaziaria o item 9 e eliminaria todo
+controle de valor sobre elas, já que a política não estabelece limite para
+categoria que não nomeia — um lançamento de R$ 5.000,00 em categoria
+arbitrária seria reembolsado integralmente.
+
+**Extensão ao fornecedor:** a mesma normalização, com o mesmo alcance — caixa
+e espaços nas extremidades, nada mais —, aplica-se ao fornecedor, usado no
+critério de duplicidade (AMB-011). "Bistro Central" e "BISTRO CENTRAL" são o
+mesmo fornecedor, e deixar a comparação exata faria uma diferença de grafia
+desfazer a detecção, que é o que a exclusão da descrição do critério
+pretendia evitar. O alcance permanece estreito pelo mesmo motivo declarado
+acima: ampliá-lo aproximaria a regra da inferência.
+
+**Custo aceito:** despesas de trabalho legítimas cuja categoria a política não
+nomeia nunca são reembolsadas pelo motor. d-005 (espaço de coworking, R$ 89,00,
+com nota fiscal) é recusado, embora seja despesa plausível de trabalho. A
+inclusão de novas categorias cabe ao RH, por alteração da política.
+**Consequências verificáveis:**
+- d-014 ("ALIMENTACAO", 61,00, com NF, 31/07) → categoria normalizada para
+  alimentação; dentro do período; reembolso 60,00, parcial; lista de motivos
+  vazia
+- d-005 ("coworking", 89,00, com NF) → reembolso 0,00, recusado, motivos
+  [CATEGORIA_INELEGIVEL]
+- "Alimentacao", "ALIMENTACAO" e " alimentacao " são a mesma categoria
+- "alimentação", com cedilha e til, não é normalizada para "alimentacao" e é
+  categoria inelegível
+- "transporte-urbano" não é normalizado para "transporte_urbano" e é
+  categoria inelegível
+- "Bistro Central", "BISTRO CENTRAL" e " Bistro Central " são o mesmo
+  fornecedor; "Bistrô Central" não é
+
+**Regra afetada:** RN-008; RN-009 (fornecedor normalizado); RN-004 (o motivo CATEGORIA_INELEGIVEL, já citado
+ali, passa a existir)
 
 ### AMB-016 — Representação do período de competência
 
@@ -650,9 +889,9 @@ inicio/fim não impede o processamento.
 **Justificativa:** o par inicio/fim é o dado mais expressivo — a competencia é
 derivável dele, mas o inverso não: um fechamento que vá de 26/06 a 25/07 não
 cabe em nenhum rótulo de mês. Exigir concordância entre os três campos
-criaria um caminho de erro de entrada que faria um engano de digitação no
-cabeçalho bloquear o reembolso de todas as despesas do lote, custo alto para
-proteger contra algo que a entrada de referência não apresenta. Quanto às
+faria da divergência um erro de lote (RN-010), e um engano de digitação no
+cabeçalho bloquearia o reembolso de todas as despesas do lote, custo alto
+para proteger contra algo que a entrada de referência não apresenta. Quanto às
 bordas, inicio e fim são datas sem hora, e "fim: 31/07" em linguagem corrente
 inclui o dia 31; adotar intervalo semiaberto faria o último dia de todo mês
 não pertencer a competência alguma, já que também não pertenceria à
@@ -660,8 +899,8 @@ competência seguinte — o que não é convenção de intervalo, é perda de di
 **Custo aceito:** o campo competencia deixa de ter efeito sobre o cálculo. Um
 lote cujo rótulo diga "2026-07" mas cujo par de datas cubra agosto será
 processado como agosto, sem alerta. Aceito porque o par de datas é a
-representação precisa, e sinalizar divergência exigiria um caminho de erro
-que a política não prevê.
+representação precisa, e tratar a divergência como erro de lote (RN-010)
+bloquearia o lote inteiro por uma inconsistência que não impede a avaliação.
 **Consequências verificáveis:**
 - o período do arquivo de exemplo é [2026-07-01, 2026-07-31], ambas inclusivas
 - d-014 (31/07) está dentro do período; seu resultado segue para as demais
@@ -670,6 +909,68 @@ que a política não prevê.
 - uma despesa em 2026-08-01 está fora do período
 
 **Regra afetada:** RN-005
+
+### AMB-017 — Distinção entre recusa e erro de entrada
+
+**Texto original do RH:** não há. A política trata de despesas bem formadas e
+não estabelece o que fazer diante de dado que não possa ser avaliado.
+**O que não está claro:** casos como d-005 (categoria não prevista) e d-009
+(valor negativo) não são cobertos pela política, e não havia critério
+declarado que determinasse se constituem decisão de negócio ou dado
+inválido. As leituras consideradas foram: (a) critério estrutural — erro é o
+dado que não pode ser avaliado, recusa é o dado bem formado que uma regra
+rejeita; (b) critério pela política — recusa quando há regra que rejeite,
+erro quando nenhuma regra cobre o caso; (c) tratar tudo como recusa com
+motivo, exceto o que impeça o processamento do lote.
+**Decisão:** adotado o critério estrutural (a). Distinguem-se três situações:
+
+1. Erro de lote — a estrutura da entrada impede qualquer avaliação: data de
+   início posterior à data de fim, período ausente, ou arquivo malformado.
+   Nenhuma despesa é processada e o lote é rejeitado.
+2. Erro de item — uma despesa não pode ser avaliada por campo obrigatório
+   ausente, tipo incompatível, data inválida ou valor menor ou igual a zero.
+   A despesa recebe a classificação erro, com reembolso 0,00, e não é
+   avaliada por nenhuma regra de elegibilidade ou de valor. As demais
+   despesas do lote são processadas normalmente.
+3. Recusa — a despesa é bem formada e uma regra de elegibilidade a rejeita.
+   Recebe a classificação recusada, com seus motivos.
+
+Os valores monetários aceitos são estritamente maiores que zero; um valor
+igual ou inferior a zero constitui erro de item.
+
+**Justificativa:** o critério estrutural mantém a fronteira estável — depende
+do contrato da entrada, não do conjunto de regras vigentes. O critério (b) a
+deslocaria a cada regra acrescentada: um caso hoje classificado como erro
+passaria a recusa assim que uma regra o cobrisse, sem que nada no dado
+tivesse mudado. O critério (c) faria a lista de motivos misturar decisões de
+negócio com problemas de formato, e o colaborador deixaria de distinguir
+"não foi reembolsado" de "foi lançado incorretamente", que exigem ações
+diferentes. Quanto ao estado adicional: a AMB-005 recusou criar um quarto
+estado ao rejeitar "pendente", mas aquele seria um estado de negócio que a
+política não previa; "erro" é de outra natureza — não é uma decisão sobre o
+reembolso, é a constatação de que não há decisão possível. Manter essa
+constatação sob a mesma classificação de uma recusa fundamentada confundiria
+as duas.
+**Custo aceito:** a decisão exige que o contrato de entrada seja declarado na
+§4 — campos obrigatórios, tipos e faixas admitidas — e torna o sistema mais
+rígido quanto à forma do dado. Um lote inteiro é rejeitado por uma
+inconsistência no cabeçalho do período, e uma despesa isolada é descartada
+por um campo ausente. Aceito porque avaliar dado que não se pode interpretar
+produziria resultado que ninguém consegue justificar.
+**Consequências verificáveis:**
+- d-009 (transporte urbano, −45,00) → erro de item; reembolso 0,00; não é
+  avaliado por nenhuma regra de elegibilidade
+- d-005 (coworking, 89,00) → bem formado; recusado, motivos
+  [CATEGORIA_INELEGIVEL]; não é erro
+- uma entrada com data de início posterior à data de fim → lote rejeitado,
+  nenhuma despesa processada
+- uma despesa sem o campo de valor → erro de item; as demais despesas do
+  lote são processadas
+- um erro de item em uma despesa não impede o processamento das demais
+
+**Em aberto:** contrato de entrada da §4, registrado na §10.
+**Regra afetada:** RN-010; RN-007 (quarto valor de classificação); RN-009
+(despesa com erro não integra grupo)
 
 ### AMB-018 — Motivos múltiplos de recusa
 
@@ -732,31 +1033,46 @@ para que o resultado seja determinístico.
 | Despesa que seria integral com nota, sem nota fiscal exigida | hospedagem, 200,00, sem NF | Reembolso 0,00 (recusado), motivos [SEM_NOTA_FISCAL]; a recusa não depende do limite (com NF seria 200,00, integral) | RN-004 |
 | Despesa de outra competência, válida em todos os outros aspectos | d-008: 15/04, alimentação, 41,00, com NF, "Almoco de abril lancado com atraso" | Fora do período (a data da despesa decide; a descrição não é interpretada). Reembolso 0,00 (recusado), motivos [FORA_DA_COMPETENCIA]; não é avaliada contra o limite | RN-005, RN-006 |
 | Despesa que viola duas regras de elegibilidade | 150,00, sem NF, data fora do período | Reembolso 0,00 (recusado), motivos [FORA_DA_COMPETENCIA, SEM_NOTA_FISCAL], nessa ordem (§8) | RN-004, RN-006, RN-007 |
-| Despesa na data de fim do período | d-014: 31/07, "ALIMENTACAO", 61,00, com NF | Dentro do período (bordas inclusivas); a verificação de período não produz motivo de recusa | RN-005 |
+| Despesa na data de fim do período, com categoria em maiúsculas | d-014: 31/07, "ALIMENTACAO", 61,00, com NF | Dentro do período (bordas inclusivas); categoria normalizada para alimentacao; reembolso 60,00 (parcial); excedente de 1,00 não reembolsado; lista de motivos vazia | RN-001, RN-002, RN-005, RN-008 |
+| Par de despesas idênticas exceto pelo identificador; esta com o menor | d-006: 09/07, alimentação, Bistro Central, 54,90, com NF | Grupo de duplicatas com d-007; mantida por ter o menor identificador; reembolso 54,90 (integral); lista de motivos vazia | RN-009 |
+| Par de despesas idênticas exceto pelo identificador; esta com o maior | d-007: 09/07, alimentação, Bistro Central, 54,90, com NF | Grupo de duplicatas com d-006; reembolso 0,00 (recusado), motivos [DUPLICATA]; o resultado não muda se a ordem na entrada for invertida | RN-009 |
+| Valor negativo (estorno) | d-009: 11/07, transporte urbano, −45,00, sem NF, "Estorno de corrida cancelada" | Erro de item (valor menor ou igual a zero); classificação erro; reembolso 0,00; não é avaliada por nenhuma regra de elegibilidade ou de valor; não abate nenhuma outra despesa | RN-010 |
+| Categoria fora das três elegíveis | d-005: 07/07, "coworking", 89,00, com NF | Reembolso 0,00 (recusado), motivos [CATEGORIA_INELEGIVEL]; não é erro de entrada | RN-008 |
 
 ## 8. Ordem de aplicação das regras
 
 <Quando duas regras incidem sobre a mesma despesa, qual vale primeiro? A ordem
 muda o resultado. Declarar isso separa spec boa de spec média.>
 
-Ordem parcial, estendida à medida que as ambiguidades pendentes forem
-decididas. A avaliação de cada despesa tem duas etapas:
+A avaliação tem três etapas:
 
-1. **Elegibilidade.** Todas as regras de elegibilidade são avaliadas, sem
-   interrupção na primeira que se aplica, e cada uma que se aplica acrescenta
-   seu motivo à lista de motivos (RN-007), nesta ordem:
+0. **Validação** (RN-010). Um erro de lote rejeita a entrada inteira, e
+   nenhuma despesa é processada. Uma despesa com erro de item é classificada
+   como erro, com reembolso 0,00, e não segue para as etapas 1 e 2.
+1. **Elegibilidade.** Para cada despesa sem erro de item, todas as regras de
+   elegibilidade são avaliadas, sem interrupção na primeira que se aplica, e
+   cada uma que se aplica acrescenta seu motivo à lista de motivos (RN-007),
+   nesta ordem:
    1. Pertinência ao período (RN-005, RN-006) → FORA_DA_COMPETENCIA.
-   2. Exigência de nota fiscal (RN-003, RN-004) → SEM_NOTA_FISCAL.
+   2. Elegibilidade da categoria (RN-008) → CATEGORIA_INELEGIVEL.
+   3. Exigência de nota fiscal (RN-003, RN-004) → SEM_NOTA_FISCAL.
+   4. Duplicidade (RN-009) → DUPLICATA, avaliada apenas entre as despesas
+      que não receberam motivo nos passos 1.1 a 1.3.
 2. **Valor.** Apenas para despesa com lista de motivos vazia: limite da
    categoria (RN-001) e reembolso parcial (RN-002). Uma despesa com qualquer
    motivo de recusa tem reembolso 0,00 e não é avaliada contra o limite.
 
-A ordem entre as duas etapas afeta o valor: a elegibilidade precede o limite
-(origem: AMB-005), de modo que uma despesa recusada não é avaliada contra o
-limite. A ordem dentro da etapa de elegibilidade não afeta o valor — basta um
-motivo para o reembolso ser zero —; ela define apenas a ordenação da lista de
-motivos, para que a mesma entrada produza sempre a mesma saída (origem:
-AMB-018).
+A validação precede tudo porque uma despesa que não pode ser avaliada não
+tem como passar por nenhuma regra (origem: AMB-017). A ordem entre as etapas
+1 e 2 afeta o valor: a elegibilidade precede o limite (origem: AMB-005), de
+modo que uma despesa recusada não é avaliada contra o limite. A duplicidade
+vem por último na elegibilidade porque é a única regra que compara despesas
+entre si, e só deve considerar as que passaram nas demais (origem: AMB-011);
+movê-la para antes mudaria quais despesas formam grupo e, portanto, qual é
+mantida. Fora isso, a ordem dentro da etapa de elegibilidade não afeta o
+valor — basta um motivo para o reembolso ser zero —; ela define a ordenação
+da lista de motivos, para que a mesma entrada produza sempre a mesma saída
+(origem: AMB-018).
 
 ## 9. Critérios de aceite
 
@@ -783,14 +1099,9 @@ O sistema está pronto quando:
   pelo processo que autoriza a viagem — não pelo colaborador que lança a
   despesa. Enquanto isso não existir, colaboradores em viagem recebem menos
   do que a política lhes garante, e a regularização cabe ao financeiro.
-- **Diárias e duplicatas (origem: AMB-009; afeta AMB-011).** Com cada diária
-  lançada como despesa própria, duas noites no mesmo hotel, na mesma data e
-  pelo mesmo valor tornam-se indistinguíveis de um lançamento duplicado — a
-  mesma configuração do par d-006/d-007. A regra de duplicidade precisará
-  estabelecer um critério capaz de separar os dois casos, ou declarar que não
-  os separa. A decisão cabe à AMB-011.
-- **Despesa fora do período e duplicidade (origem: AMB-010; afeta AMB-011).**
-  A RN-006 estabelece que uma despesa fora do período não participa de
-  nenhuma comparação com outras despesas, o que implica que ela não pode ser
-  o original de um par de duplicatas. A AMB-011 deve confirmar essa
-  implicação ou declarar exceção.
+- **Contrato de entrada e representação de erros (origem: AMB-017).** A §4
+  precisa declarar os campos obrigatórios, seus tipos e faixas admitidas, sem
+  o que a RN-010 não é verificável. Precisa também definir como a saída
+  representa uma despesa com erro de item — em particular, se e como informa
+  qual campo falhou — e o que a saída contém quando o lote é rejeitado por
+  erro de lote. Pendente até a redação da §4.

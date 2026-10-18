@@ -10,6 +10,76 @@ Ordem cronológica inversa: a mais recente primeiro.
 
 ---
 
+## D-005 — Registros atualizados após AMB-011, 013 e 017 · `2026-10-18`
+
+**Gatilho:** as decisões de duplicidade (AMB-011), categoria (AMB-013) e
+distinção entre recusa e erro (AMB-017) resolveram pendências registradas em
+textos já salvos e criaram uma restrição sobre a AMB-009.
+
+**O que mudou na spec:**
+- AMB-009, Decisão: acrescentado que "cada lançamento de diária traz a data
+  da noite a que se refere, de modo que diárias consecutivas tenham datas
+  distintas e não constituam duplicata (AMB-011)". Sem isso, duas noites
+  consecutivas no mesmo hotel lançadas na mesma data satisfariam o critério
+  de duplicidade.
+- AMB-002, Consequências (d-014): de "60,00, parcial (condicionado à
+  AMB-013)" para "60,00, parcial; a categoria é normalizada para alimentacao
+  (RN-008)".
+- RN-007, Regra: de "todas as regras de elegibilidade são avaliadas para toda
+  despesa" para "para toda despesa sem erro de item (RN-010)"; acrescentado
+  que a classificação assume quatro valores — integral, parcial, recusada ou
+  erro — e que uma despesa com erro tem a lista de motivos de recusa vazia.
+  Origem: acrescentada a AMB-017. Aceite: acrescentado d-009.
+- §8: de duas etapas com dois passos de elegibilidade para três etapas —
+  validação, elegibilidade (período, categoria, nota fiscal, duplicidade) e
+  valor —, com o motivo de a duplicidade vir por último declarado. Removida a
+  ressalva de ordem parcial.
+- §7: a linha de d-014 passa a declarar o resultado completo (60,00,
+  parcial); acrescentadas d-005, d-006, d-007 e d-009.
+- §10: removidos "Diárias e duplicatas", resolvido pela alteração da AMB-009,
+  e "Despesa fora do período e duplicidade", confirmado pela RN-009;
+  acrescentado "Contrato de entrada e representação de erros", pendente.
+- RN-005, Aceite, e AMB-008, Consequências: de "d-001 a d-007 e d-009 a
+  d-013 → dentro do período" e "as despesas entre 03/07 e 22/07 estão dentro
+  do período" para versões que excluem d-009, erro de item não avaliado pela
+  regra de período (RN-010).
+- AMB-001, Consequências (d-006 e d-007): de "o tratamento passa a depender
+  apenas da regra de duplicata (AMB-011)" para o resultado afirmado — d-006
+  54,90, integral; d-007 0,00, motivos [DUPLICATA] (RN-009).
+- AMB-005 e AMB-010, Justificativa: de "quarto estado" para "estado
+  adicional", já que a classificação passou a ter quatro valores (RN-007).
+- AMB-016, Justificativa e Custo aceito: de "criaria um caminho de erro de
+  entrada" e "exigiria um caminho de erro que a política não prevê" para
+  formulações que remetem ao erro de lote da RN-010, que passou a existir.
+- AMB-009, Custo aceito: de "as duas diárias, lançadas separadamente" para
+  "lançadas separadamente, cada uma com a data da sua noite".
+- AMB-013, Decisão: estendida a normalização ao fornecedor, com o mesmo
+  alcance da categoria. RN-008 passa a normalizar categoria e fornecedor;
+  RN-009 passa a usar o fornecedor normalizado. AMB-011, Decisão: de
+  "fornecedor" para "fornecedor normalizado (AMB-013)", para que a decisão
+  descreva o mesmo critério que a RN-009 implementa.
+- RN-009, Regra: declarada a ordem lexicográfica dos identificadores, com o
+  caso "d-10" precede "d-9" como aceite.
+- AMB-011, Consequências: a consequência sobre par com e sem nota fiscal
+  passa a valer apenas para valor até R$ 100,00 — acima disso a despesa sem
+  nota é recusada pela RN-004 e não integra o grupo.
+- AMB-012: registrada como dissolvida pela AMB-017.
+
+**Por quê:** a spec descreve o estado atual do sistema. Uma consequência
+condicionada a ambiguidade já decidida, uma regra que avalia "toda despesa"
+quando parte delas passou a não ser avaliada, e pendências da §10 já
+resolvidas fariam a spec afirmar coisas que deixaram de ser verdade.
+
+**O que isso invalidou:** nenhum critério de aceite. A regra de lançamento da
+AMB-009 ficou mais restritiva: diárias de uma mesma estadia lançadas na mesma
+data passam a ser tratadas como duplicata.
+
+**Tasks afetadas:** nenhuma — tasks.md ainda não foi escrito.
+
+**Custo:** 1 arquivo, correção pontual.
+
+---
+
 ## D-004 — Ordem de aplicação e motivo de recusa reescritos após AMB-008, 010, 016 e 018 · `2026-10-18`
 
 **Gatilho:** a decisão de motivos múltiplos (AMB-018), tornada necessária pelo
