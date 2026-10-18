@@ -50,29 +50,30 @@ Cada regra recebe um ID (`RN-001`, ...). As tasks vão referenciar esses IDs.
 > **Limites nominais, sem ampliação por viagem:** o sistema não determina se o
 > colaborador está em viagem (AMB-007). Todas as despesas são avaliadas com os
 > limites nominais da política — alimentação R$ 60,00, transporte urbano
-> R$ 80,00, hospedagem R$ 250,00 por diária —, e os critérios de aceite e os
-> casos de borda deste documento valem para qualquer despesa, sem distinção
-> de viagem.
+> R$ 80,00, hospedagem R$ 250,00 por lançamento (uma diária) —, e os
+> critérios de aceite e os casos de borda deste documento valem para qualquer
+> despesa, sem distinção de viagem.
 
 ### RN-001 — Limite de categoria aplicado por despesa individual
 
 **Regra:** cada despesa de alimentação, transporte urbano ou hospedagem é
 comparada, isoladamente, com o limite da sua categoria (alimentação R$ 60,00;
-transporte urbano R$ 80,00; hospedagem R$ 250,00 por diária). Nenhuma outra
-despesa altera o resultado da despesa avaliada por meio de agregação de
-valores: não há soma de despesas da mesma categoria no mesmo dia. Não existe
-teto diário agregado por categoria. Em hospedagem, o limite é por diária: o
-limite de um lançamento de hospedagem é R$ 250,00 multiplicado pelo número de
-diárias que ele cobre, número definido pela AMB-009 (pendente).
-**Origem:** política do RH, itens 1, 2 e 3; decisões AMB-001 e AMB-007
-**Depende de:** RN-002 (reembolso parcial, decidido na AMB-002); AMB-009
-(número de diárias em lançamento de hospedagem), pendente.
+transporte urbano R$ 80,00; hospedagem R$ 250,00). Nenhuma outra despesa
+altera o resultado da despesa avaliada por meio de agregação de valores: não
+há soma de despesas da mesma categoria no mesmo dia. Não existe teto diário
+agregado por categoria. Em hospedagem, o limite é por diária e cada
+lançamento vale uma diária: R$ 250,00 por lançamento (AMB-009).
+**Origem:** política do RH, itens 1, 2 e 3; decisões AMB-001, AMB-007 e AMB-009
+**Depende de:** RN-002 (reembolso parcial, decidido na AMB-002).
 **Aceite:**
 - d-001 (03/07, alimentação, 72,50) → reembolso 60,00, parcial.
 - d-002 (03/07, alimentação, 38,00) → reembolso 38,00, integral.
 - O dia 03/07 totaliza 98,00 reembolsados em alimentação.
 - Inverter a ordem de d-001 e d-002 na entrada não altera nenhum dos valores acima.
 - Três despesas de alimentação de 59,00 no mesmo dia → 59,00 cada, 177,00 no total.
+- d-010 (14/07, hospedagem, 480,00, com NF, "Hotel Rio - 2 diarias") →
+  limite 250,00; reembolso 250,00, parcial; excedente 230,00. A descrição não
+  altera o limite.
 
 ### RN-002 — Reembolso parcial: o limite é teto
 
@@ -83,8 +84,7 @@ tem reembolso igual ao limite aplicável; o excedente (valor menos limite) não
 classificada como integral. O limite aplicável é o limite nominal da
 categoria conforme a RN-001; não há ampliação por viagem (AMB-007).
 **Origem:** política do RH, item 4; decisões AMB-002 e AMB-007
-**Depende de:** AMB-009 (número de diárias em lançamento de hospedagem),
-pendente.
+**Depende de:** RN-001 (limite da categoria).
 **Aceite:**
 - d-001 (03/07, alimentação, 72,50) → reembolso 60,00, parcial; excedente 12,50.
 - Alimentação de 60,00 → reembolso 60,00, integral.
@@ -117,8 +117,8 @@ pendente.
   integral.
 - Alimentação de 500,00, sem NF → nota fiscal exigida e ausente, embora o
   teto da categoria seja 60,00; reembolso 0,00, recusado (RN-004).
-- d-013 (22/07, hospedagem, 690,00, sem NF) → nota fiscal exigida e ausente,
-  qualquer que seja o número de diárias; reembolso 0,00, recusado (RN-004).
+- d-013 (22/07, hospedagem, 690,00, sem NF) → nota fiscal exigida e ausente;
+  reembolso 0,00, recusado (RN-004).
 
 ### RN-004 — Recusa integral por ausência de nota fiscal exigida
 
@@ -135,7 +135,7 @@ de CATEGORIA_INELEGIVEL.
 - d-004 (06/07, transporte urbano, 100,01, sem NF) → reembolso 0,00,
   recusado, motivo SEM_NOTA_FISCAL.
 - d-013 (22/07, hospedagem, 690,00, sem NF) → reembolso 0,00, recusado,
-  motivo SEM_NOTA_FISCAL, qualquer que seja o número de diárias.
+  motivo SEM_NOTA_FISCAL.
 - Alimentação de 500,00, sem NF → reembolso 0,00, recusado, motivo
   SEM_NOTA_FISCAL, embora o teto da categoria seja 60,00.
 - Hospedagem de 200,00, sem NF → reembolso 0,00, recusado, motivo
@@ -162,9 +162,8 @@ despesa individualmente ou sobre a soma das despesas da mesma categoria no
 mesmo dia.
 **Decisão:** o limite incide sobre CADA DESPESA individualmente, uniformemente
 nas três categorias. Em hospedagem, o limite incide por diária e não por dia
-de calendário — um lançamento pode cobrir múltiplas diárias numa única data;
-quantas é objeto da AMB-009, e o limite aplicável a um lançamento de
-hospedagem fica condicionado àquela decisão.
+de calendário; cada lançamento de hospedagem corresponde a uma diária
+(AMB-009), e seu limite é R$ 250,00.
 **Justificativa:** o limite é teto de razoabilidade por despesa, não orçamento
 diário. Um colaborador que almoça e janta a trabalho tem duas necessidades
 legítimas; zerar a segunda porque a primeira consumiu o teto puniria gasto
@@ -261,7 +260,7 @@ brecha cabe ao texto da política, não à interpretação do motor.
 - d-013 (hospedagem, 690,00, sem NF) → nota fiscal exigida e ausente;
   reembolso 0,00, recusado, motivo SEM_NOTA_FISCAL (RN-004)
 - d-010 (hospedagem, 480,00, com NF) → nota fiscal exigida e presente; segue
-  para o limite
+  para o limite de 250,00 → reembolso 250,00, parcial
 - uma despesa de 100,01 com nota fiscal → segue para o limite normalmente
 
 **Regra afetada:** RN-003
@@ -309,7 +308,7 @@ registrado na §10 — d-013 perde integralmente o reembolso.
 - d-004 (transporte urbano, 100,01, sem NF) → reembolso 0,00, recusado,
   motivo SEM_NOTA_FISCAL
 - d-013 (hospedagem, 690,00, sem NF) → reembolso 0,00, recusado, motivo
-  SEM_NOTA_FISCAL, qualquer que seja o número de diárias
+  SEM_NOTA_FISCAL
 - alimentação de 500,00 sem NF → reembolso 0,00, recusado, motivo
   SEM_NOTA_FISCAL, embora o teto da categoria seja 60,00
 - d-003 (transporte urbano, 100,00, sem NF) → nota não exigida; reembolso
@@ -340,7 +339,7 @@ nota, qualquer que fosse o valor lançado, e um jantar de R$ 500 sem
 comprovante renderia R$ 60. O item 5 da política passaria a valer apenas
 para hospedagem, a única categoria cujo limite supera R$ 100 — e nela a
 leitura (b) produz o mesmo resultado que a (a), porque o limite de
-hospedagem nunca é inferior a R$ 250. A leitura (c) reintroduziria
+hospedagem é sempre R$ 250,00 (AMB-009). A leitura (c) reintroduziria
 agregação, que a AMB-001 rejeitou, abriria a questão nova de qual é o grupo,
 e alteraria uma consequência já registrada na AMB-004.
 
@@ -365,7 +364,7 @@ ele é aceito na AMB-005 como custo da natureza documental da regra.
   nota fiscal não exigida; reembolso 80,00, parcial
 - d-013 (hospedagem, 690,00, sem NF) → valor de referência 690,00; nota
   fiscal exigida e ausente; resultado idêntico nas leituras (a) e (b),
-  porque o limite de hospedagem nunca é inferior a R$ 250; reembolso 0,00,
+  porque o limite de hospedagem é sempre R$ 250,00 (AMB-009); reembolso 0,00,
   recusado, motivo SEM_NOTA_FISCAL (RN-004)
 - alimentação de 500,00 sem NF → nota fiscal exigida e ausente (na leitura
   (b) não seria exigida, pois o teto é 60,00); reembolso 0,00, recusado,
@@ -416,8 +415,8 @@ consegue sustentar diante de uma auditoria.
 **Custo aceito:** o item 6 da política não é cumprido pelo motor, e o erro é
 sempre na mesma direção — contra o colaborador em viagem, nunca contra a
 empresa. No arquivo de exemplo, d-010 (hospedagem de 480,00 com nota)
-recebe 250,00 em vez dos 375,00 que receberia se a diária fosse ampliada,
-caso o lançamento conte uma diária; a diferença é de 125,00. Despesas de
+recebe 250,00 em vez dos 375,00 que receberia se a diária fosse ampliada;
+a diferença é de 125,00. Despesas de
 alimentação e transporte de colaboradores efetivamente em viagem são
 limitadas a 60,00 e 80,00 em vez de 90,00 e 120,00. A regularização desses
 casos permanece com o financeiro, por conferência manual. Aceito porque a
@@ -426,9 +425,9 @@ consegue comprovar, produzindo resultado que o auditor não tem como
 verificar e que o colaborador pode influenciar.
 **Consequências verificáveis:**
 - todos os limites são os nominais: alimentação 60,00; transporte urbano
-  80,00; hospedagem 250,00 por diária
-- d-010 (hospedagem, 480,00, com NF) → limite 250,00 por diária, sem
-  ampliação; resultado final condicionado à AMB-009
+  80,00; hospedagem 250,00 por lançamento (uma diária)
+- d-010 (hospedagem, 480,00, com NF) → limite 250,00, sem ampliação;
+  reembolso 250,00, parcial (AMB-009)
 - d-011 (alimentação, 15/07, no mesmo fornecedor de d-010) → limite 60,00;
   a proximidade com um lançamento de hospedagem não altera o limite
 - d-003 (transporte urbano, 100,00, "Corrida aeroporto") → limite 80,00; a
@@ -441,6 +440,57 @@ verificar e que o colaborador pode influenciar.
 **Em aberto:** registrado na §10.
 **Regra afetada:** RN-001, RN-002; §3 (fora de escopo)
 
+### AMB-009 — Número de diárias em um lançamento de hospedagem
+
+**Texto original do RH:** "Hospedagem tem limite de R$ 250 por diária." (item 3)
+**O que não está claro:** a política estabelece o limite por diária, mas a
+entrada não informa quantas diárias um lançamento cobre. Cada despesa tem
+uma única data, sem entrada nem saída, e nenhum campo de quantidade. O
+número aparece apenas em texto livre na descrição, com redação variável —
+"2 diarias" em d-010 e "3 noites" em d-013. As leituras consideradas foram:
+(a) cada lançamento vale uma diária; (b) extrair o número da descrição;
+(c) inferir o número a partir do valor, dividindo pelo limite; (d) estender
+a entrada com um campo explícito.
+**Decisão:** adotada a leitura (a). Cada lançamento de hospedagem é avaliado
+como uma diária, e seu limite é sempre R$ 250,00. Uma estadia de várias
+noites deve ser lançada como uma despesa por diária. A descrição não é
+interpretada.
+**Justificativa:** o número de diárias não é dado estruturado, e as demais
+leituras o produzem de formas que o motor não consegue sustentar. A leitura
+(b) faria o limite depender de texto redigido pelo próprio colaborador —
+escrever uma diária a mais na descrição vale R$ 250,00 de limite adicional,
+sem que nada na despesa mude — e é o mesmo motivo pelo qual a AMB-007
+rejeitou inferir viagem a partir de texto livre; o vocabulário é
+comprovadamente aberto, já que o próprio arquivo de exemplo usa duas
+palavras distintas para a mesma coisa. A leitura (c) esvaziaria o item 3 da
+política: como o número de diárias seria sempre o suficiente para cobrir o
+valor, nenhuma hospedagem jamais excederia o limite. A leitura (d) estenderia
+um formato de entrada que o enunciado declara fixo, e no arquivo de exemplo
+o resultado dependeria inteiramente do valor padrão adotado. A leitura (a) é
+a única que produz o limite a partir de campos estruturados, é imune a
+redação, e converte o "por diária" da política em uma regra de lançamento
+verificável: uma diária, um lançamento.
+**Custo aceito:** uma estadia lançada de forma consolidada é penalizada pela
+forma do lançamento, não pelo valor. d-010 (R$ 480,00 por duas noites,
+R$ 240,00 por noite, abaixo do limite) recebe R$ 250,00 e perde R$ 230,00 —
+sendo que as duas diárias, lançadas separadamente, seriam reembolsadas
+integralmente. A correção cabe ao processo de lançamento, não ao motor.
+Aceito porque a alternativa é conceder limite adicional com base em
+informação que o colaborador escreve e que o sistema não tem como conferir.
+**Consequências verificáveis:**
+- o limite de qualquer lançamento de hospedagem é R$ 250,00
+- d-010 (hospedagem, 480,00, com NF, "Hotel Rio - 2 diarias") → reembolso
+  250,00, parcial; excedente de 230,00 não reembolsado
+- d-013 (hospedagem, 690,00, sem NF) → reembolso 0,00, recusado, motivo
+  SEM_NOTA_FISCAL; a recusa precede a avaliação do limite, de modo que esta
+  decisão não altera seu resultado
+- hospedagem de 400,00 com NF descrita como "1 diaria" e a mesma hospedagem
+  de 400,00 descrita como "2 diarias" produzem o mesmo resultado: 250,00,
+  parcial
+- hospedagem de 200,00 com NF → reembolso 200,00, integral
+
+**Regra afetada:** RN-001
+
 <A política tem no mínimo oito. Se você achou menos, releia
 `exemplos/despesas-exemplo.json` — cada item daquele arquivo existe por um motivo.>
 
@@ -451,9 +501,9 @@ verificar e que o colaborador pode influenciar.
 > **Limites nominais, sem ampliação por viagem:** o sistema não determina se o
 > colaborador está em viagem (AMB-007). Todas as despesas são avaliadas com os
 > limites nominais da política — alimentação R$ 60,00, transporte urbano
-> R$ 80,00, hospedagem R$ 250,00 por diária —, e os critérios de aceite e os
-> casos de borda deste documento valem para qualquer despesa, sem distinção
-> de viagem.
+> R$ 80,00, hospedagem R$ 250,00 por lançamento (uma diária) —, e os
+> critérios de aceite e os casos de borda deste documento valem para qualquer
+> despesa, sem distinção de viagem.
 
 | Caso | Entrada | Comportamento esperado | Regra |
 |---|---|---|---|
@@ -465,7 +515,8 @@ verificar e que o colaborador pode influenciar.
 | Despesa logo acima de R$ 100,00 com nota fiscal | transporte urbano, 100,01, com NF | Nota fiscal exigida e presente; reembolso 80,00 (parcial); excedente de 20,01 não reembolsado | RN-002, RN-003 |
 | Despesa acima de R$ 100,00 cujo teto fica abaixo de R$ 100,00, sem nota fiscal | d-004: 06/07, transporte urbano, 100,01, sem NF | Nota fiscal exigida e ausente: a exigência usa o valor lançado (100,01), não o teto de 80,00. Reembolso 0,00 (recusado), motivo SEM_NOTA_FISCAL | RN-003, RN-004 |
 | Despesa muito acima do teto, sem nota fiscal | alimentação, 500,00, sem NF | Nota fiscal exigida e ausente, embora o teto da categoria seja 60,00. Reembolso 0,00 (recusado), motivo SEM_NOTA_FISCAL | RN-003, RN-004 |
-| Hospedagem acima de R$ 100,00 sem nota fiscal | d-013: 22/07, hospedagem, 690,00, sem NF | Nota fiscal exigida e ausente, qualquer que seja o número de diárias. Reembolso 0,00 (recusado), motivo SEM_NOTA_FISCAL | RN-003, RN-004 |
+| Hospedagem acima de R$ 100,00 sem nota fiscal | d-013: 22/07, hospedagem, 690,00, sem NF | Nota fiscal exigida e ausente. Reembolso 0,00 (recusado), motivo SEM_NOTA_FISCAL | RN-003, RN-004 |
+| Hospedagem de várias noites lançada num único lançamento | d-010: 14/07, hospedagem, 480,00, com NF, "Hotel Rio - 2 diarias" | Nota fiscal exigida e presente; limite 250,00 (um lançamento, uma diária; a descrição não é interpretada); reembolso 250,00 (parcial); excedente de 230,00 não reembolsado | RN-001, RN-002, RN-003 |
 | Despesa que seria integral com nota, sem nota fiscal exigida | hospedagem, 200,00, sem NF | Reembolso 0,00 (recusado), motivo SEM_NOTA_FISCAL; a recusa não depende do limite (com NF seria 200,00, integral) | RN-004 |
 
 ## 8. Ordem de aplicação das regras
@@ -511,3 +562,9 @@ O sistema está pronto quando:
   pelo processo que autoriza a viagem — não pelo colaborador que lança a
   despesa. Enquanto isso não existir, colaboradores em viagem recebem menos
   do que a política lhes garante, e a regularização cabe ao financeiro.
+- **Diárias e duplicatas (origem: AMB-009; afeta AMB-011).** Com cada diária
+  lançada como despesa própria, duas noites no mesmo hotel, na mesma data e
+  pelo mesmo valor tornam-se indistinguíveis de um lançamento duplicado — a
+  mesma configuração do par d-006/d-007. A regra de duplicidade precisará
+  estabelecer um critério capaz de separar os dois casos, ou declarar que não
+  os separa. A decisão cabe à AMB-011.

@@ -10,6 +10,68 @@ Ordem cronológica inversa: a mais recente primeiro.
 
 ---
 
+## D-003 — Limite de hospedagem fixado em uma diária por lançamento após a AMB-009 · `2026-10-18`
+
+**Gatilho:** a decisão da AMB-009 (leitura a: cada lançamento de hospedagem
+vale uma diária) tornou falsa uma afirmação da decisão da AMB-001 e
+obsoletos registros que tratavam o número de diárias como pendente ou
+variável: a RN-001, a RN-002, a AMB-006 e a AMB-007.
+
+**O que mudou na spec:**
+- AMB-001, Decisão: de "um lançamento pode cobrir múltiplas diárias numa
+  única data; quantas é objeto da AMB-009, e o limite aplicável a um
+  lançamento de hospedagem fica condicionado àquela decisão" para "cada
+  lançamento de hospedagem corresponde a uma diária (AMB-009), e seu limite
+  é R$ 250,00". O restante da decisão foi preservado.
+- RN-001, Regra: de "o limite de um lançamento de hospedagem é R$ 250,00
+  multiplicado pelo número de diárias que ele cobre, número definido pela
+  AMB-009 (pendente)" para "cada lançamento vale uma diária: R$ 250,00 por
+  lançamento (AMB-009)". Origem: acrescentada a AMB-009. Depende de: AMB-009
+  removida. Aceite: acrescentado d-010 → 250,00, parcial.
+- RN-002, Depende de: de "AMB-009 (…), pendente" para "RN-001 (limite da
+  categoria)".
+- AMB-006, Justificativa e Consequências (d-013): de "o limite de
+  hospedagem nunca é inferior a R$ 250" para "o limite de hospedagem é
+  sempre R$ 250,00 (AMB-009)".
+- AMB-007, Custo aceito: removida a condicional "caso o lançamento conte uma
+  diária"; o resultado de d-010 (250,00 em vez de 375,00) passa a ser
+  afirmado.
+- AMB-007, Consequências (d-010): de "limite 250,00 por diária, sem
+  ampliação; resultado final condicionado à AMB-009" para "limite 250,00,
+  sem ampliação; reembolso 250,00, parcial (AMB-009)".
+- AMB-004, Consequências (d-010): de "segue para o limite" para "segue para
+  o limite de 250,00 → reembolso 250,00, parcial".
+- RN-003 e RN-004 (aceites de d-013), AMB-005 (Consequências de d-013) e §7
+  (caso de d-013): removida a expressão "qualquer que seja o número de
+  diárias". A recusa por ausência de nota precede a avaliação do limite, de
+  modo que nem diárias nem descrição entram na conta.
+- §5 e §7 (premissa global) e AMB-007 (Consequências): de "R$ 250,00 por
+  diária" para "R$ 250,00 por lançamento (uma diária)", para que quem lê sem
+  conhecer a AMB-009 não multiplique pelo número de noites.
+- RN-001, lista de limites da Regra: de "hospedagem R$ 250,00 por diária"
+  para "hospedagem R$ 250,00"; a explicação de que cada lançamento vale uma
+  diária fica na frase seguinte da regra, com a origem (AMB-009).
+- §7: novo caso de borda para d-010.
+- §10: novo item "Diárias e duplicatas", dependência criada por esta decisão
+  e levada à AMB-011.
+
+**Por quê:** a spec descreve o estado atual do sistema. A decisão da AMB-001
+afirmava algo que a AMB-009 negou, e a RN-001 descrevia uma multiplicação
+por um número que o motor não determina.
+
+**O que isso invalidou:** a frase da decisão da AMB-001 sobre múltiplas
+diárias por lançamento. Nenhum critério de aceite caiu: os aceites de d-013
+e da hospedagem de 200,00 permanecem válidos. A decisão criou uma
+dependência nova: com uma diária por lançamento, diárias legítimas no mesmo
+hotel e na mesma data ficam indistinguíveis de duplicatas, o que restringe a
+AMB-011 (registrado na §10).
+
+**Tasks afetadas:** nenhuma — tasks.md ainda não foi escrito.
+
+**Custo:** 1 arquivo, correção pontual.
+
+---
+
 ## D-002 — Premissa de viagem tornada permanente após a AMB-007 · `2026-10-18`
 
 **Gatilho:** a decisão da AMB-007 (leitura a: caracterização de viagem fora

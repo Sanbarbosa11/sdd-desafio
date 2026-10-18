@@ -61,6 +61,12 @@ anteriores (AMB-005) eram em campos de registro; estas eram no enunciado
 das regras, que é o que alguém usaria para implementar. A varredura
 sistemática depois de cada decisão virou parte do meu processo.
 
+18/10 — AMB-009: a varredura achou cinco itens, e o quinto (H5) não era
+uma inconsistência — era uma consequência da decisão que eu não tinha
+previsto. Lançar cada diária como despesa própria torna duas noites no mesmo
+hotel indistinguíveis de uma duplicata, que é exatamente o par d-006/d-007
+do exemplo. Nenhuma varredura por texto acharia isso; ele inferiu a partir
+do efeito da decisão. Registrei na §10 como dependência para a AMB-011.
 
 ## Erros do agente
 18/10 — AMB-004: o agente afirmou que, no arquivo de exemplo, nenhuma
