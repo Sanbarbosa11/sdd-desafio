@@ -10,6 +10,48 @@ Ordem cronológica inversa: a mais recente primeiro.
 
 ---
 
+## D-004 — Ordem de aplicação e motivo de recusa reescritos após AMB-008, 010, 016 e 018 · `2026-10-18`
+
+**Gatilho:** a decisão de motivos múltiplos (AMB-018), tornada necessária pelo
+segundo motivo de recusa criado na AMB-010, alterou registros já salvos: a
+§8, que tratava a recusa por nota fiscal como interrupção da avaliação, e a
+RN-004, que declarava um motivo único.
+
+**O que mudou na spec:**
+- §8: de uma sequência em que "se a nota é exigida e ausente, o item é
+  recusado (RN-004) e não segue para o passo 2" para duas etapas —
+  elegibilidade, em que todas as regras são avaliadas e seus motivos
+  coletados na ordem período → nota fiscal, e valor, aplicada apenas a
+  despesas sem motivo de recusa. A ordem dentro da elegibilidade passa a
+  definir a ordenação da lista de motivos.
+- RN-004, Regra: de "classificada como recusada, com motivo SEM_NOTA_FISCAL"
+  para "com o motivo SEM_NOTA_FISCAL na sua lista de motivos (RN-007)";
+  acrescentado que, quando mais de uma causa se aplica, os motivos coexistem
+  na lista. Origem: acrescentada a AMB-018. Depende de: acrescentada a
+  RN-007.
+- Aceites, consequências verificáveis e linhas da §7 (RN-004, AMB-004,
+  AMB-005, AMB-006, AMB-009 e §7, além dos novos RN-006, AMB-008 e AMB-010):
+  de "motivo SEM_NOTA_FISCAL" e "motivo FORA_DA_COMPETENCIA" para
+  "motivos [SEM_NOTA_FISCAL]" e "motivos [FORA_DA_COMPETENCIA]". O texto das
+  regras e das decisões mantém o singular, por não ser critério verificável.
+
+**Por quê:** a spec descreve o estado atual do sistema. Com dois motivos de
+recusa independentes e a decisão de reportar todos, uma §8 que interrompe a
+avaliação na primeira recusa, uma RN-004 com motivo único e aceites que
+descrevem o motivo como valor escalar contradiriam a RN-007 — quem
+implementasse a partir de um aceite no singular poderia produzir um campo
+escalar.
+
+**O que isso invalidou:** nenhum critério de aceite. O valor reembolsado de
+todos os itens permanece o mesmo; muda apenas a representação dos motivos e
+a garantia de que todos são reportados.
+
+**Tasks afetadas:** nenhuma — tasks.md ainda não foi escrito.
+
+**Custo:** 1 arquivo, correção pontual.
+
+---
+
 ## D-003 — Limite de hospedagem fixado em uma diária por lançamento após a AMB-009 · `2026-10-18`
 
 **Gatilho:** a decisão da AMB-009 (leitura a: cada lançamento de hospedagem

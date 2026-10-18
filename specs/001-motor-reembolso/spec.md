@@ -123,27 +123,92 @@ pendente.
 ### RN-004 — Recusa integral por ausência de nota fiscal exigida
 
 **Regra:** uma despesa que exige nota fiscal conforme a RN-003 e não a
-apresenta tem reembolso 0,00 e é classificada como recusada, com motivo
-SEM_NOTA_FISCAL. A recusa é integral e independe do limite da categoria: o
-item não é avaliado contra o limite (RN-001, RN-002), e um lançamento que
-seria integral caso tivesse nota é recusado da mesma forma. O motivo
-SEM_NOTA_FISCAL é distinto de qualquer outra causa de recusa, em particular
-de CATEGORIA_INELEGIVEL.
-**Origem:** política do RH, item 5; decisão AMB-005
-**Depende de:** RN-003 (exigência de nota fiscal).
+apresenta tem reembolso 0,00 e é classificada como recusada, com o motivo
+SEM_NOTA_FISCAL na sua lista de motivos (RN-007). A recusa é integral e
+independe do limite da categoria: o item não é avaliado contra o limite
+(RN-001, RN-002), e um lançamento que seria integral caso tivesse nota é
+recusado da mesma forma. O motivo SEM_NOTA_FISCAL é distinto de qualquer
+outra causa de recusa, em particular de CATEGORIA_INELEGIVEL; quando mais de
+uma causa se aplica, os motivos coexistem na lista.
+**Origem:** política do RH, item 5; decisões AMB-005 e AMB-018
+**Depende de:** RN-003 (exigência de nota fiscal); RN-007 (lista de motivos).
 **Aceite:**
 - d-004 (06/07, transporte urbano, 100,01, sem NF) → reembolso 0,00,
-  recusado, motivo SEM_NOTA_FISCAL.
+  recusado, motivos [SEM_NOTA_FISCAL].
 - d-013 (22/07, hospedagem, 690,00, sem NF) → reembolso 0,00, recusado,
-  motivo SEM_NOTA_FISCAL.
-- Alimentação de 500,00, sem NF → reembolso 0,00, recusado, motivo
-  SEM_NOTA_FISCAL, embora o teto da categoria seja 60,00.
-- Hospedagem de 200,00, sem NF → reembolso 0,00, recusado, motivo
-  SEM_NOTA_FISCAL; com NF, seria 200,00, integral.
+  motivos [SEM_NOTA_FISCAL].
+- Alimentação de 500,00, sem NF → reembolso 0,00, recusado, motivos
+  [SEM_NOTA_FISCAL], embora o teto da categoria seja 60,00.
+- Hospedagem de 200,00, sem NF → reembolso 0,00, recusado, motivos
+  [SEM_NOTA_FISCAL]; com NF, seria 200,00, integral.
 - d-003 (06/07, transporte urbano, 100,00, sem NF) → nota fiscal não exigida;
   esta regra não se aplica; reembolso 80,00, parcial.
 - Transporte urbano de 100,01, com NF → esta regra não se aplica; reembolso
   80,00, parcial.
+
+### RN-005 — Período de competência e pertinência da despesa
+
+**Regra:** o período de competência é o intervalo que vai da data de início à
+data de fim informadas no período da entrada, com ambas as bordas inclusivas:
+uma data igual à de início ou igual à de fim pertence ao período. O rótulo de
+competência (o mês informado, como "2026-07") é informativo e não participa
+da avaliação; divergência entre ele e o par de datas não impede o
+processamento. Uma despesa pertence ao período quando a sua data está nesse
+intervalo. A data da despesa é o único dado avaliado; a descrição não é
+interpretada. Uma despesa fora do período é recusada conforme a RN-006.
+**Origem:** política do RH, item 7; decisões AMB-008 e AMB-016
+**Depende de:** RN-006 (recusa por despesa fora do período).
+**Aceite:**
+- Arquivo de exemplo → período de 2026-07-01 a 2026-07-31, ambas as datas
+  incluídas.
+- d-014 (31/07, igual à data de fim) → dentro do período.
+- Despesa em 2026-07-01 (igual à data de início) → dentro do período.
+- Despesa em 2026-08-01 → fora do período.
+- d-008 (15/04, "Almoco de abril lancado com atraso") → fora do período; a
+  descrição não altera o resultado.
+- d-001 a d-007 e d-009 a d-013 (datas entre 03/07 e 22/07) → dentro do
+  período.
+
+### RN-006 — Recusa por despesa fora do período
+
+**Regra:** uma despesa cuja data está fora do período conforme a RN-005 tem
+reembolso 0,00 e é classificada como recusada, com o motivo
+FORA_DA_COMPETENCIA na sua lista de motivos (RN-007). O item aparece na saída
+com seus motivos, como qualquer outro. A recusa independe do limite da
+categoria: o item não é avaliado contra o limite (RN-001, RN-002). Uma
+despesa fora do período não participa de nenhuma agregação ou comparação com
+outras despesas.
+**Origem:** política do RH, item 7; decisões AMB-010 e AMB-018
+**Depende de:** RN-005 (período e pertinência); RN-007 (lista de motivos).
+**Aceite:**
+- d-008 (15/04, alimentação, 41,00, com NF) → reembolso 0,00, recusado,
+  motivos [FORA_DA_COMPETENCIA], embora seja válida em todos os outros aspectos.
+- d-014 (31/07) → dentro do período; esta regra não se aplica.
+- Despesa em 2026-08-01, alimentação, 30,00, com NF → reembolso 0,00,
+  recusado, motivos [FORA_DA_COMPETENCIA].
+
+### RN-007 — Lista de motivos de recusa
+
+**Regra:** a saída de cada despesa traz a lista de todos os motivos de recusa
+aplicáveis, e não um motivo único. Todas as regras de elegibilidade são
+avaliadas para toda despesa, sem interrupção na primeira que se aplica, e cada
+uma que se aplica acrescenta seu motivo à lista. Se a lista contém qualquer
+motivo, a despesa é recusada com reembolso 0,00 e não é avaliada contra o
+limite. Se a lista está vazia, a despesa segue para o limite da categoria e é
+classificada como integral ou parcial conforme a RN-002; o reembolso parcial
+não é motivo de recusa e não entra na lista. A lista é ordenada na ordem das
+regras de elegibilidade declarada na §8, de modo que a mesma entrada produza
+sempre a mesma saída.
+**Origem:** decisão AMB-018
+**Depende de:** §8 (ordem das regras de elegibilidade).
+**Aceite:**
+- Despesa de 150,00, sem NF, com data fora do período → reembolso 0,00,
+  recusado, motivos [FORA_DA_COMPETENCIA, SEM_NOTA_FISCAL].
+- d-008 → reembolso 0,00, recusado, motivos [FORA_DA_COMPETENCIA].
+- d-004 → reembolso 0,00, recusado, motivos [SEM_NOTA_FISCAL].
+- Despesa sem nenhuma violação (por exemplo, d-002) → lista de motivos vazia.
+- d-001 (72,50, acima do limite) → reembolso 60,00, parcial; lista de motivos
+  vazia.
 
 ---
 
@@ -256,9 +321,9 @@ brecha cabe ao texto da política, não à interpretação do motor.
 - d-003 (transporte urbano, 100,00, sem NF) → nota fiscal dispensada; segue
   para o limite de 80,00 → reembolso 80,00, parcial
 - d-004 (transporte urbano, 100,01, sem NF) → nota fiscal exigida e ausente;
-  reembolso 0,00, recusado, motivo SEM_NOTA_FISCAL (RN-004)
+  reembolso 0,00, recusado, motivos [SEM_NOTA_FISCAL] (RN-004)
 - d-013 (hospedagem, 690,00, sem NF) → nota fiscal exigida e ausente;
-  reembolso 0,00, recusado, motivo SEM_NOTA_FISCAL (RN-004)
+  reembolso 0,00, recusado, motivos [SEM_NOTA_FISCAL] (RN-004)
 - d-010 (hospedagem, 480,00, com NF) → nota fiscal exigida e presente; segue
   para o limite de 250,00 → reembolso 250,00, parcial
 - uma despesa de 100,01 com nota fiscal → segue para o limite normalmente
@@ -306,11 +371,11 @@ sobretudo sobre fornecedores que habitualmente não emitem nota, conforme já
 registrado na §10 — d-013 perde integralmente o reembolso.
 **Consequências verificáveis:**
 - d-004 (transporte urbano, 100,01, sem NF) → reembolso 0,00, recusado,
-  motivo SEM_NOTA_FISCAL
-- d-013 (hospedagem, 690,00, sem NF) → reembolso 0,00, recusado, motivo
-  SEM_NOTA_FISCAL
-- alimentação de 500,00 sem NF → reembolso 0,00, recusado, motivo
-  SEM_NOTA_FISCAL, embora o teto da categoria seja 60,00
+  motivos [SEM_NOTA_FISCAL]
+- d-013 (hospedagem, 690,00, sem NF) → reembolso 0,00, recusado, motivos
+  [SEM_NOTA_FISCAL]
+- alimentação de 500,00 sem NF → reembolso 0,00, recusado, motivos
+  [SEM_NOTA_FISCAL], embora o teto da categoria seja 60,00
 - d-003 (transporte urbano, 100,00, sem NF) → nota não exigida; reembolso
   80,00, parcial — inalterado
 - transporte urbano de 100,01 com NF → reembolso 80,00, parcial — inalterado
@@ -358,17 +423,17 @@ perde R$ 80,00 por conta do centavo. Registro aqui que o desconforto existe;
 ele é aceito na AMB-005 como custo da natureza documental da regra.
 **Consequências verificáveis:**
 - d-004 (transporte urbano, 100,01, sem NF) → valor de referência 100,01;
-  nota fiscal exigida e ausente; reembolso 0,00, recusado, motivo
-  SEM_NOTA_FISCAL (RN-004)
+  nota fiscal exigida e ausente; reembolso 0,00, recusado, motivos
+  [SEM_NOTA_FISCAL] (RN-004)
 - d-003 (transporte urbano, 100,00, sem NF) → valor de referência 100,00;
   nota fiscal não exigida; reembolso 80,00, parcial
 - d-013 (hospedagem, 690,00, sem NF) → valor de referência 690,00; nota
   fiscal exigida e ausente; resultado idêntico nas leituras (a) e (b),
   porque o limite de hospedagem é sempre R$ 250,00 (AMB-009); reembolso 0,00,
-  recusado, motivo SEM_NOTA_FISCAL (RN-004)
+  recusado, motivos [SEM_NOTA_FISCAL] (RN-004)
 - alimentação de 500,00 sem NF → nota fiscal exigida e ausente (na leitura
   (b) não seria exigida, pois o teto é 60,00); reembolso 0,00, recusado,
-  motivo SEM_NOTA_FISCAL (RN-004)
+  motivos [SEM_NOTA_FISCAL] (RN-004)
 
 **Sem circularidade:** a exigência de nota passa a depender apenas do valor
 normalizado, de modo que a cadeia valor → nota fiscal → limite → reembolso
@@ -440,6 +505,49 @@ verificar e que o colaborador pode influenciar.
 **Em aberto:** registrado na §10.
 **Regra afetada:** RN-001, RN-002; §3 (fora de escopo)
 
+### AMB-008 — Dado que determina a pertinência ao período
+
+**Texto original do RH:** "Despesas devem ser lançadas dentro do período de
+competência." (item 7)
+**O que não está claro:** a palavra "lançadas" sugere a data do lançamento, que
+a entrada não possui — cada despesa traz apenas uma data, sem indicação de
+quando foi registrada. As leituras consideradas foram: (a) usar a data da
+despesa; (b) usar a data do lançamento, que não existe, deixando a regra sem
+efeito ou fora de escopo; (c) aceitar qualquer despesa ocorrida até o fim do
+período, recusando apenas datas futuras.
+**Decisão:** adotada a leitura (a). A pertinência ao período é avaliada pela
+data da despesa, comparada ao intervalo definido na AMB-016.
+**Justificativa:** a data da despesa é o único dado de data que a entrada
+fornece, e é estruturada e precisa. Lida como regra contábil, a frase do item
+7 determina que cada despesa seja lançada na competência a que pertence — e
+uma despesa pertence à competência em que ocorreu. A leitura (b) deixaria o
+item 7 sem efeito algum: o motor reembolsaria despesas de qualquer data,
+inclusive de anos anteriores. A leitura (c) faria uma despesa de abril ser
+paga no fechamento de julho, dissolvendo a separação contábil por mês, que é
+a finalidade do item 7.
+
+Sobre a diferença em relação à AMB-007: ali a caracterização de viagem foi
+declarada fora de escopo porque o dado não existe e não há substituto
+confiável — toda inferência disponível era frágil ou manipulável. Aqui o dado
+literal ("data do lançamento") também não existe, mas há substituto preciso e
+estruturado: a data da despesa. Declarar a regra fora de escopo havendo dado
+adequado seria descartar informação que a entrada fornece.
+
+**Custo aceito:** uma despesa legítima apresentada no lote de uma competência
+diferente da sua perde o reembolso. d-008 (alimentação de 41,00, com nota
+fiscal, ocorrida em 15/04 e apresentada no lote de julho) não é reembolsada,
+embora seja uma despesa válida em todos os outros aspectos. Como na AMB-009,
+a correção cabe ao processo de lançamento: apresentar a despesa no lote da
+competência correta.
+**Consequências verificáveis:**
+- d-008 (15/04, lote de julho) → fora do período; reembolso 0,00, recusado,
+  motivos [FORA_DA_COMPETENCIA] (RN-006)
+- as despesas entre 03/07 e 22/07 estão dentro do período
+- a descrição de d-008 ("Almoco de abril lancado com atraso") não é
+  interpretada, em coerência com a AMB-007 e a AMB-009
+
+**Regra afetada:** RN-005
+
 ### AMB-009 — Número de diárias em um lançamento de hospedagem
 
 **Texto original do RH:** "Hospedagem tem limite de R$ 250 por diária." (item 3)
@@ -481,8 +589,8 @@ informação que o colaborador escreve e que o sistema não tem como conferir.
 - o limite de qualquer lançamento de hospedagem é R$ 250,00
 - d-010 (hospedagem, 480,00, com NF, "Hotel Rio - 2 diarias") → reembolso
   250,00, parcial; excedente de 230,00 não reembolsado
-- d-013 (hospedagem, 690,00, sem NF) → reembolso 0,00, recusado, motivo
-  SEM_NOTA_FISCAL; a recusa precede a avaliação do limite, de modo que esta
+- d-013 (hospedagem, 690,00, sem NF) → reembolso 0,00, recusado, motivos
+  [SEM_NOTA_FISCAL]; a recusa precede a avaliação do limite, de modo que esta
   decisão não altera seu resultado
 - hospedagem de 400,00 com NF descrita como "1 diaria" e a mesma hospedagem
   de 400,00 descrita como "2 diarias" produzem o mesmo resultado: 250,00,
@@ -490,6 +598,110 @@ informação que o colaborador escreve e que o sistema não tem como conferir.
 - hospedagem de 200,00 com NF → reembolso 200,00, integral
 
 **Regra afetada:** RN-001
+
+### AMB-010 — Efeito de uma despesa fora do período
+
+**Texto original do RH:** "Despesas devem ser lançadas dentro do período de
+competência." (item 7) A política não estabelece a consequência de não
+estarem.
+**O que não está claro:** quatro leituras — (a) recusar com motivo próprio; (b)
+excluir do processamento, de modo que o item não apareça na saída; (c) marcar
+como pendente para a competência correta; (d) reembolsar normalmente e
+registrar um alerta.
+**Decisão:** adotada a leitura (a). Uma despesa cuja data esteja fora do
+período tem reembolso 0,00 e é classificada como recusada, com motivo
+FORA_DA_COMPETENCIA. O item aparece na saída com seu motivo, como qualquer
+outro.
+**Justificativa:** é o mesmo padrão adotado na AMB-005 — o item permanece
+visível e o colaborador sabe por que não foi reembolsado e o que fazer, que é
+apresentá-lo no lote da competência correta. A leitura (b) retiraria o item
+da saída, e o enunciado exige que o motor justifique cada decisão; um item
+ausente não distingue "excluído" de "esquecido". As leituras (c) e (d) foram
+rejeitadas na AMB-005 pelos mesmos motivos que valem aqui: a primeira cria um
+quarto estado e abre a questão de até quando a reapresentação é possível; a
+segunda trata uma obrigação da política como recomendação.
+**Custo aceito:** a saída passa a conter itens com reembolso zero que não
+foram avaliados contra as demais regras de valor. Aceito porque a
+visibilidade do item e a explicitação do motivo valem mais que a brevidade da
+saída.
+**Consequências verificáveis:**
+- d-008 (alimentação, 41,00, com NF, 15/04) → reembolso 0,00, recusado,
+  motivos [FORA_DA_COMPETENCIA]
+- d-014 (31/07) → dentro do período; esta regra não se aplica
+- uma despesa fora do período não participa de nenhuma agregação ou
+  comparação com outras despesas
+
+**Regra afetada:** RN-006
+
+### AMB-016 — Representação do período de competência
+
+**Texto original do RH:** "Despesas devem ser lançadas dentro do período de
+competência." (item 7) A política não diz como o período é representado. A
+entrada traz três campos: competencia ("2026-07"), inicio ("2026-07-01") e
+fim ("2026-07-31").
+**O que não está claro:** duas questões independentes. (i) qual campo define
+o período quando há mais de um — competencia, o par inicio/fim, ou os três
+precisam concordar; (ii) se as datas de borda pertencem ao período.
+**Decisão:** o período é o intervalo definido por inicio e fim, com ambas as
+bordas inclusivas. Uma despesa cuja data seja igual a inicio ou igual a fim
+está dentro do período. O campo competencia é tratado como rótulo
+informativo e não participa da avaliação; divergência entre ele e o par
+inicio/fim não impede o processamento.
+**Justificativa:** o par inicio/fim é o dado mais expressivo — a competencia é
+derivável dele, mas o inverso não: um fechamento que vá de 26/06 a 25/07 não
+cabe em nenhum rótulo de mês. Exigir concordância entre os três campos
+criaria um caminho de erro de entrada que faria um engano de digitação no
+cabeçalho bloquear o reembolso de todas as despesas do lote, custo alto para
+proteger contra algo que a entrada de referência não apresenta. Quanto às
+bordas, inicio e fim são datas sem hora, e "fim: 31/07" em linguagem corrente
+inclui o dia 31; adotar intervalo semiaberto faria o último dia de todo mês
+não pertencer a competência alguma, já que também não pertenceria à
+competência seguinte — o que não é convenção de intervalo, é perda de dia.
+**Custo aceito:** o campo competencia deixa de ter efeito sobre o cálculo. Um
+lote cujo rótulo diga "2026-07" mas cujo par de datas cubra agosto será
+processado como agosto, sem alerta. Aceito porque o par de datas é a
+representação precisa, e sinalizar divergência exigiria um caminho de erro
+que a política não prevê.
+**Consequências verificáveis:**
+- o período do arquivo de exemplo é [2026-07-01, 2026-07-31], ambas inclusivas
+- d-014 (31/07) está dentro do período; seu resultado segue para as demais
+  regras
+- uma despesa em 2026-07-01 está dentro do período
+- uma despesa em 2026-08-01 está fora do período
+
+**Regra afetada:** RN-005
+
+### AMB-018 — Motivos múltiplos de recusa
+
+**Texto original do RH:** não há. A dúvida surgiu das decisões AMB-005 e
+AMB-010, que criaram dois motivos de recusa independentes.
+**O que não está claro:** uma despesa pode violar mais de uma regra
+simultaneamente — por exemplo, uma despesa de abril, de R$ 150,00, sem nota
+fiscal, viola competência e documentação. A spec não declarava se a saída
+reporta um único motivo ou todos.
+**Decisão:** a saída de cada despesa traz a lista de todos os motivos
+aplicáveis, e não um motivo único. Todas as regras de elegibilidade são
+avaliadas e seus motivos coletados; o reembolso é zero se qualquer motivo de
+recusa estiver presente. A lista é ordenada de forma determinística, na
+ordem declarada na §8, de modo que a mesma entrada produza sempre a mesma
+saída.
+**Justificativa:** as causas de recusa são independentes entre si, e eleger
+uma delas exigiria uma ordem de precedência arbitrária que esconderia as
+demais. Reportar todas permite ao colaborador corrigir tudo de uma vez, em
+lugar de descobrir um problema por submissão. A decisão também simplifica a
+§8: a ordem das regras passa a tratar apenas do que afeta o valor
+reembolsado, não do que afeta o rótulo.
+**Custo aceito:** a representação da saída fica mais complexa, com uma lista
+no lugar de um valor escalar, e é necessário declarar a ordenação da lista
+para que o resultado seja determinístico.
+**Consequências verificáveis:**
+- uma despesa de 150,00, sem nota fiscal, com data fora do período →
+  reembolso 0,00, recusado, motivos [FORA_DA_COMPETENCIA, SEM_NOTA_FISCAL]
+- d-008 → reembolso 0,00, recusado, motivos [FORA_DA_COMPETENCIA]
+- d-004 → reembolso 0,00, recusado, motivos [SEM_NOTA_FISCAL]
+- uma despesa sem nenhuma violação → lista de motivos vazia
+
+**Regra afetada:** RN-004, RN-006, RN-007; §8
 
 <A política tem no mínimo oito. Se você achou menos, releia
 `exemplos/despesas-exemplo.json` — cada item daquele arquivo existe por um motivo.>
@@ -513,11 +725,14 @@ informação que o colaborador escreve e que o sistema não tem como conferir.
 | Despesa de valor exatamente igual ao limite | alimentação, 60,00 | Reembolso 60,00 (integral) | RN-002 |
 | Despesa de exatamente R$ 100,00 sem nota fiscal | d-003: 06/07, transporte urbano, 100,00, sem NF | Nota fiscal não exigida; reembolso 80,00 (parcial); excedente de 20,00 não reembolsado | RN-002, RN-003 |
 | Despesa logo acima de R$ 100,00 com nota fiscal | transporte urbano, 100,01, com NF | Nota fiscal exigida e presente; reembolso 80,00 (parcial); excedente de 20,01 não reembolsado | RN-002, RN-003 |
-| Despesa acima de R$ 100,00 cujo teto fica abaixo de R$ 100,00, sem nota fiscal | d-004: 06/07, transporte urbano, 100,01, sem NF | Nota fiscal exigida e ausente: a exigência usa o valor lançado (100,01), não o teto de 80,00. Reembolso 0,00 (recusado), motivo SEM_NOTA_FISCAL | RN-003, RN-004 |
-| Despesa muito acima do teto, sem nota fiscal | alimentação, 500,00, sem NF | Nota fiscal exigida e ausente, embora o teto da categoria seja 60,00. Reembolso 0,00 (recusado), motivo SEM_NOTA_FISCAL | RN-003, RN-004 |
-| Hospedagem acima de R$ 100,00 sem nota fiscal | d-013: 22/07, hospedagem, 690,00, sem NF | Nota fiscal exigida e ausente. Reembolso 0,00 (recusado), motivo SEM_NOTA_FISCAL | RN-003, RN-004 |
+| Despesa acima de R$ 100,00 cujo teto fica abaixo de R$ 100,00, sem nota fiscal | d-004: 06/07, transporte urbano, 100,01, sem NF | Nota fiscal exigida e ausente: a exigência usa o valor lançado (100,01), não o teto de 80,00. Reembolso 0,00 (recusado), motivos [SEM_NOTA_FISCAL] | RN-003, RN-004 |
+| Despesa muito acima do teto, sem nota fiscal | alimentação, 500,00, sem NF | Nota fiscal exigida e ausente, embora o teto da categoria seja 60,00. Reembolso 0,00 (recusado), motivos [SEM_NOTA_FISCAL] | RN-003, RN-004 |
+| Hospedagem acima de R$ 100,00 sem nota fiscal | d-013: 22/07, hospedagem, 690,00, sem NF | Nota fiscal exigida e ausente. Reembolso 0,00 (recusado), motivos [SEM_NOTA_FISCAL] | RN-003, RN-004 |
 | Hospedagem de várias noites lançada num único lançamento | d-010: 14/07, hospedagem, 480,00, com NF, "Hotel Rio - 2 diarias" | Nota fiscal exigida e presente; limite 250,00 (um lançamento, uma diária; a descrição não é interpretada); reembolso 250,00 (parcial); excedente de 230,00 não reembolsado | RN-001, RN-002, RN-003 |
-| Despesa que seria integral com nota, sem nota fiscal exigida | hospedagem, 200,00, sem NF | Reembolso 0,00 (recusado), motivo SEM_NOTA_FISCAL; a recusa não depende do limite (com NF seria 200,00, integral) | RN-004 |
+| Despesa que seria integral com nota, sem nota fiscal exigida | hospedagem, 200,00, sem NF | Reembolso 0,00 (recusado), motivos [SEM_NOTA_FISCAL]; a recusa não depende do limite (com NF seria 200,00, integral) | RN-004 |
+| Despesa de outra competência, válida em todos os outros aspectos | d-008: 15/04, alimentação, 41,00, com NF, "Almoco de abril lancado com atraso" | Fora do período (a data da despesa decide; a descrição não é interpretada). Reembolso 0,00 (recusado), motivos [FORA_DA_COMPETENCIA]; não é avaliada contra o limite | RN-005, RN-006 |
+| Despesa que viola duas regras de elegibilidade | 150,00, sem NF, data fora do período | Reembolso 0,00 (recusado), motivos [FORA_DA_COMPETENCIA, SEM_NOTA_FISCAL], nessa ordem (§8) | RN-004, RN-006, RN-007 |
+| Despesa na data de fim do período | d-014: 31/07, "ALIMENTACAO", 61,00, com NF | Dentro do período (bordas inclusivas); a verificação de período não produz motivo de recusa | RN-005 |
 
 ## 8. Ordem de aplicação das regras
 
@@ -525,17 +740,23 @@ informação que o colaborador escreve e que o sistema não tem como conferir.
 muda o resultado. Declarar isso separa spec boa de spec média.>
 
 Ordem parcial, estendida à medida que as ambiguidades pendentes forem
-decididas:
+decididas. A avaliação de cada despesa tem duas etapas:
 
-1. Exigência de nota fiscal (RN-003). Se a nota é exigida e ausente, o item é
-   recusado (RN-004) e não segue para o passo 2.
-2. Limite da categoria (RN-001) e reembolso parcial (RN-002).
+1. **Elegibilidade.** Todas as regras de elegibilidade são avaliadas, sem
+   interrupção na primeira que se aplica, e cada uma que se aplica acrescenta
+   seu motivo à lista de motivos (RN-007), nesta ordem:
+   1. Pertinência ao período (RN-005, RN-006) → FORA_DA_COMPETENCIA.
+   2. Exigência de nota fiscal (RN-003, RN-004) → SEM_NOTA_FISCAL.
+2. **Valor.** Apenas para despesa com lista de motivos vazia: limite da
+   categoria (RN-001) e reembolso parcial (RN-002). Uma despesa com qualquer
+   motivo de recusa tem reembolso 0,00 e não é avaliada contra o limite.
 
-A verificação de nota fiscal precede a aplicação do limite (origem:
-AMB-005). Nas regras decididas até aqui, o resultado é o mesmo em qualquer
-ordem, porque a recusa zera o item qualquer que seja o limite; a ordem fica
-declarada para que um item recusado por ausência de nota não seja avaliado
-contra o limite.
+A ordem entre as duas etapas afeta o valor: a elegibilidade precede o limite
+(origem: AMB-005), de modo que uma despesa recusada não é avaliada contra o
+limite. A ordem dentro da etapa de elegibilidade não afeta o valor — basta um
+motivo para o reembolso ser zero —; ela define apenas a ordenação da lista de
+motivos, para que a mesma entrada produza sempre a mesma saída (origem:
+AMB-018).
 
 ## 9. Critérios de aceite
 
@@ -568,3 +789,8 @@ O sistema está pronto quando:
   mesma configuração do par d-006/d-007. A regra de duplicidade precisará
   estabelecer um critério capaz de separar os dois casos, ou declarar que não
   os separa. A decisão cabe à AMB-011.
+- **Despesa fora do período e duplicidade (origem: AMB-010; afeta AMB-011).**
+  A RN-006 estabelece que uma despesa fora do período não participa de
+  nenhuma comparação com outras despesas, o que implica que ela não pode ser
+  o original de um par de duplicatas. A AMB-011 deve confirmar essa
+  implicação ou declarar exceção.
