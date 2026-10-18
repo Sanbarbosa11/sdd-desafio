@@ -22,6 +22,14 @@ eu tinha corrigido na AMB-001, agora pego por ele. O fiscal do CLAUDE.md
 começou a funcionar sozinho. Optei por trocar a entrada por um caso genérico
 de 61,00 em vez de remover a linha, pra não perder o caso de estouro mínimo.
 
+18/10 — Reflexão sobre a ordem: percebi que subagente/MCP/hooks são
+multiplicadores de execução, não de direção. Usá-los antes da spec seria
+chegar mais rápido ao lugar errado. Os dois recursos que usei nesta fase
+foram o CLAUDE.md como fiscal (devolve as decisões pra mim em vez de decidir)
+e delegação em modo aumentação (ele levanta leituras e calcula números, eu
+decido e justifico). Planejo um subagente revisor de spec depois que ela
+fechar, com contexto limpo, pra procurar o que eu não vi.
+
 ## Erros do agente
 18/10 — AMB-004: o agente afirmou que, no arquivo de exemplo, nenhuma
 despesa passa de R$ 100 antes do corte e fica abaixo depois — logo a AMB-006
