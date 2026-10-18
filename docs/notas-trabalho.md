@@ -23,10 +23,20 @@ começou a funcionar sozinho. Optei por trocar a entrada por um caso genérico
 de 61,00 em vez de remover a linha, pra não perder o caso de estouro mínimo.
 
 ## Erros do agente
-<!-- data | o que propôs | por que errado | como detectei | o que fiz | sessão -->
+18/10 — AMB-004: o agente afirmou que, no arquivo de exemplo, nenhuma
+despesa passa de R$ 100 antes do corte e fica abaixo depois — logo a AMB-006
+(NF pelo valor original ou pelo reembolsável) não teria caso concreto. Usei
+essa afirmação na minha resposta. Na rodada seguinte ele voltou atrás
+sozinho: d-004 é exatamente esse caso (100,01 originais, 80,00 reembolsáveis),
+e d-013 também se a AMB-009 contar 1 diária. A AMB-006 decide d-004 entre
+0,00 e 80,00. Não detectei por conta própria — aceitei a afirmação dele sem
+cruzar com os números do JSON.
 
 ## Li o diff?
-<!-- task | inteiro / passei o olho / não li | consequência -->
+18/10 — AMB-004: li o diff, mas aceitei sem verificar uma afirmação factual
+sobre o conteúdo do despesas-exemplo.json. Custou um raciocínio errado que
+só não virou decisão errada porque ele corrigiu. Lição: conferir afirmação
+sobre dado contra o dado, não contra a memória.
 
 ## Paradas por bug de spec
 <!-- data | regra que eu ia explicar no chat | AMB/RN criada | commit -->

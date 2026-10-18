@@ -47,6 +47,12 @@ e impede você de mover a trave depois.>
 
 Cada regra recebe um ID (`RN-001`, ...). As tasks vão referenciar esses IDs.
 
+> **Premissa:** Salvo indicação em contrário, os critérios de aceite e os casos de borda
+> deste documento assumem despesas fora de viagem, com os limites nominais da
+> política. A caracterização de viagem e a ampliação de limites são tratadas
+> na AMB-007; quando ela for decidida, os casos afetados serão revistos e os
+> que dependerem do estado de viagem passarão a declará-lo explicitamente.
+
 ### RN-001 — Limite de categoria aplicado por despesa individual
 
 **Regra:** cada despesa de alimentação, transporte urbano ou hospedagem é
@@ -60,8 +66,9 @@ agregado por categoria. Em hospedagem, o limite é por diária: o limite de um
 lançamento de hospedagem é R$ 250,00 multiplicado pelo número de diárias que
 ele cobre, número definido pela AMB-009 (pendente).
 **Origem:** política do RH, itens 1, 2 e 3; decisão AMB-001
-**Depende de:** RN-002 (reembolso parcial, decidido na AMB-002) e AMB-009
-(número de diárias em lançamento de hospedagem), pendente.
+**Depende de:** RN-002 (reembolso parcial, decidido na AMB-002); AMB-007
+(ampliação de limite em viagem) e AMB-009 (número de diárias em lançamento de
+hospedagem), pendentes.
 **Aceite:**
 - d-001 (03/07, alimentação, 72,50) → reembolso 60,00, parcial.
 - d-002 (03/07, alimentação, 38,00) → reembolso 38,00, integral.
@@ -86,7 +93,36 @@ diárias em lançamento de hospedagem), ambas pendentes.
 - Alimentação de 60,01 → reembolso 60,00, parcial; excedente 0,01.
 - Transporte urbano de 90,00 → reembolso 80,00, parcial; excedente 10,00.
 
-### RN-003 — ...
+### RN-003 — Nota fiscal obrigatória acima de R$ 100,00
+
+**Regra:** uma despesa cujo valor é estritamente maior que R$ 100,00 exige
+nota fiscal. Uma despesa de valor menor ou igual a R$ 100,00 não exige nota
+fiscal, tenha ela nota ou não. A comparação usa o valor lançado da despesa,
+já normalizado conforme a AMB-014, antes de qualquer aplicação de limite; o
+valor reembolsável não interfere na exigência. Uma despesa que exige nota fiscal e a
+apresenta não sofre nenhum efeito desta regra e segue para o limite da sua
+categoria. O efeito sobre uma despesa que exige nota fiscal e não a
+apresenta é definido pela AMB-005.
+**Origem:** política do RH, item 5; decisões AMB-004 e AMB-006
+**Depende de:** RN-002 (reembolso parcial, decidido na AMB-002); AMB-005
+(efeito da ausência de nota fiscal exigida), AMB-007 (ampliação de limite em
+viagem) e AMB-014 (precisão monetária, que define a fronteira para valores
+como 100,004), pendentes.
+**Aceite:**
+- d-003 (06/07, transporte urbano, 100,00, sem NF) → nota fiscal não exigida;
+  reembolso 80,00, parcial.
+- d-004 (06/07, transporte urbano, 100,01, sem NF) → nota fiscal exigida e
+  ausente.
+- Transporte urbano de 100,01, com NF → nota fiscal exigida e presente;
+  reembolso 80,00, parcial.
+- Alimentação de 50,00, sem NF → nota fiscal não exigida; reembolso 50,00,
+  integral.
+- Alimentação de 500,00, sem NF → nota fiscal exigida e ausente, embora o
+  teto da categoria seja 60,00.
+- d-013 (22/07, hospedagem, 690,00, sem NF) → nota fiscal exigida e ausente,
+  qualquer que seja o número de diárias.
+
+### RN-004 — ...
 
 ---
 
@@ -173,7 +209,96 @@ distribuir.
 Registrada para manter a rastreabilidade da numeração e documentar que a
 dúvida foi identificada antes de ser eliminada.
 
-### AMB-004 — ...
+### AMB-004 — Fronteira da obrigatoriedade de nota fiscal
+
+**Texto original do RH:** "Nota fiscal é obrigatória acima de R$ 100." (item 5)
+**O que não está claro:** "acima de R$ 100" admite duas leituras — (a)
+estritamente maior, de modo que uma despesa de exatamente R$ 100,00 não
+exige nota fiscal; (b) maior ou igual, de modo que R$ 100,00 já exige.
+**Decisão:** adotada a leitura (a). A nota fiscal é obrigatória para despesas
+de valor estritamente maior que R$ 100,00. Uma despesa de exatamente
+R$ 100,00 não exige nota fiscal. A comparação usa o valor da despesa já
+normalizado conforme a AMB-014 (precisão monetária).
+**Justificativa:** "acima de" em português corrente exclui o valor citado, e a
+AMB-002 já adotou esse mesmo sentido para "acima do limite" no item 4 da
+política. Manter a mesma expressão com o mesmo significado nos dois itens
+evita que a spec atribua sentidos diferentes à mesma palavra sem motivo
+declarado. Uma política que pretendesse incluir o valor teria escrito "a
+partir de R$ 100".
+**Custo aceito:** R$ 100,00 passa a ser o maior valor reembolsável sem
+comprovante fiscal, e um lançamento redondo nesse valor sem nota — como
+d-003, uma corrida de táxi de exatamente R$ 100,00 — é aprovado sem
+comprovação documental. Aceito porque a alternativa exigiria afirmar que o
+RH escreveu "acima de" querendo dizer "a partir de", e a correção dessa
+brecha cabe ao texto da política, não à interpretação do motor.
+**Consequências verificáveis:**
+- d-003 (transporte urbano, 100,00, sem NF) → nota fiscal dispensada; segue
+  para o limite de 80,00 → reembolso 80,00, parcial
+- d-004 (transporte urbano, 100,01, sem NF) → nota fiscal exigida e ausente;
+  resultado definido pela AMB-005
+- d-013 (hospedagem, 690,00, sem NF) → nota fiscal exigida e ausente;
+  resultado definido pela AMB-005
+- d-010 (hospedagem, 480,00, com NF) → nota fiscal exigida e presente; segue
+  para o limite
+- uma despesa de 100,01 com nota fiscal → segue para o limite normalmente
+
+**Regra afetada:** RN-003
+
+### AMB-005 — ...
+
+### AMB-006 — Valor de referência para a exigência de nota fiscal
+
+**Texto original do RH:** item 5, "Nota fiscal é obrigatória acima de R$ 100." A política
+informa a fronteira, mas não diz qual valor é comparado com ela.
+**O que não está claro:** três leituras — (a) o valor original da despesa, já
+normalizado; (b) o valor reembolsável após a aplicação do limite; (c) o valor
+agregado de um grupo de despesas (dia, fornecedor ou ambos).
+**Decisão:** adotada a leitura (a). A exigência de nota fiscal é avaliada sobre
+o valor da despesa lançado, já normalizado conforme a AMB-014, antes de
+qualquer aplicação de limite.
+**Justificativa:** a nota fiscal comprova que a transação existiu e custou o
+valor declarado — o objeto da comprovação é a despesa, não a parcela que a
+empresa decide pagar. A leitura (b) esvaziaria a regra: como o limite de
+alimentação é no máximo R$ 90 e o de transporte fora de viagem é R$ 80,
+nenhuma despesa dessas categorias poderia exigir nota, e um jantar de R$ 500
+sem comprovante renderia R$ 60. Produziria ainda o efeito invertido de
+exigir mais documentação de quem viaja, já que o limite ampliado passaria a
+ultrapassar R$ 100. A leitura (c) reintroduziria agregação, que a AMB-001
+rejeitou, abriria a questão nova de qual é o grupo, e alteraria uma
+consequência já registrada na AMB-004.
+
+Quanto à coerência com a AMB-002: lá se rejeitou punir desvio mínimo porque
+a regra é de cálculo e opera sobre uma régua contínua — faz sentido pagar
+proporcionalmente. Aqui a regra é documental, e documentação é binária: o
+comprovante existe ou não existe, não há meio comprovante. Um limiar nítido
+é próprio da natureza da regra, não uma inconsistência com a decisão anterior.
+
+**Custo aceito:** a fronteira fica abrupta no valor lançado. d-004 (R$ 100,01)
+difere de d-003 (R$ 100,00) por um centavo que a empresa não pagaria em
+nenhum dos dois casos, já que o teto de transporte é R$ 80 — e ainda assim
+a exigência de nota muda. A severidade dessa diferença depende da AMB-005:
+se a ausência de nota recusar o item inteiro, d-004 perde R$ 80,00 por esse
+centavo; se a ausência limitar o reembolso ao teto de dispensa, a diferença
+some. Registro aqui que o desconforto existe e que seu tratamento cabe à
+AMB-005, não a esta decisão.
+**Consequências verificáveis:**
+- d-004 (transporte urbano, 100,01, sem NF) → valor de referência 100,01;
+  nota fiscal exigida e ausente; efeito definido pela AMB-005
+- d-003 (transporte urbano, 100,00, sem NF) → valor de referência 100,00;
+  nota fiscal não exigida; reembolso 80,00, parcial
+- d-013 (hospedagem, 690,00, sem NF) → valor de referência 690,00; nota
+  fiscal exigida e ausente; resultado idêntico nas leituras (a) e (b),
+  porque o limite de hospedagem nunca é inferior a R$ 250
+- alimentação de 500,00 sem NF → nota fiscal exigida e ausente (na leitura
+  (b) não seria exigida, pois o teto é 60,00)
+
+**Sem circularidade:** a exigência de nota passa a depender apenas do valor
+normalizado, de modo que a cadeia valor → nota fiscal → limite → reembolso
+é linear. A leitura (b) exigiria definir explicitamente qual "valor
+reembolsável" é usado, sob pena de contradição lógica — um item cujo
+reembolso cai abaixo de R$ 100 por efeito da ausência de nota deixaria de
+exigir nota, e voltaria a exigi-la ao ser reembolsado integralmente.
+**Regra afetada:** RN-003
 
 <A política tem no mínimo oito. Se você achou menos, releia
 `exemplos/despesas-exemplo.json` — cada item daquele arquivo existe por um motivo.>
@@ -182,12 +307,23 @@ dúvida foi identificada antes de ser eliminada.
 
 ## 7. Casos de borda
 
+> **Premissa:** Salvo indicação em contrário, os critérios de aceite e os casos de borda
+> deste documento assumem despesas fora de viagem, com os limites nominais da
+> política. A caracterização de viagem e a ampliação de limites são tratadas
+> na AMB-007; quando ela for decidida, os casos afetados serão revistos e os
+> que dependerem do estado de viagem passarão a declará-lo explicitamente.
+
 | Caso | Entrada | Comportamento esperado | Regra |
 |---|---|---|---|
 | Duas despesas de alimentação no mesmo dia; esta acima do limite | d-001: 03/07, alimentação, 72,50 | Reembolso 60,00 (parcial); excedente de 12,50 não reembolsado | RN-001, RN-002 |
 | Duas despesas de alimentação no mesmo dia; esta abaixo do limite, a outra acima | d-002: 03/07, alimentação, 38,00 | Reembolso 38,00 (integral); d-001 no mesmo dia não reduz o valor | RN-001 |
 | Despesa ligeiramente acima do limite | alimentação, 61,00 | Reembolso 60,00 (parcial); excedente de 1,00 não reembolsado | RN-002 |
 | Despesa de valor exatamente igual ao limite | alimentação, 60,00 | Reembolso 60,00 (integral) | RN-002 |
+| Despesa de exatamente R$ 100,00 sem nota fiscal | d-003: 06/07, transporte urbano, 100,00, sem NF | Nota fiscal não exigida; reembolso 80,00 (parcial); excedente de 20,00 não reembolsado | RN-002, RN-003 |
+| Despesa logo acima de R$ 100,00 com nota fiscal | transporte urbano, 100,01, com NF | Nota fiscal exigida e presente; reembolso 80,00 (parcial); excedente de 20,01 não reembolsado | RN-002, RN-003 |
+| Despesa acima de R$ 100,00 cujo teto fica abaixo de R$ 100,00, sem nota fiscal | d-004: 06/07, transporte urbano, 100,01, sem NF | Nota fiscal exigida e ausente: a exigência usa o valor lançado (100,01), não o teto de 80,00 | RN-003 |
+| Despesa muito acima do teto, sem nota fiscal | alimentação, 500,00, sem NF | Nota fiscal exigida e ausente, embora o teto da categoria seja 60,00 | RN-003 |
+| Hospedagem acima de R$ 100,00 sem nota fiscal | d-013: 22/07, hospedagem, 690,00, sem NF | Nota fiscal exigida e ausente, qualquer que seja o número de diárias | RN-003 |
 
 ## 8. Ordem de aplicação das regras
 
@@ -207,3 +343,9 @@ O sistema está pronto quando:
   despesa, a política não limita o gasto diário agregado. Se o RH pretendia
   esse controle, seria necessário um teto diário adicional que a política
   atual não estabelece.
+- **Disponibilidade de nota fiscal por tipo de fornecedor (origem: AMB-006).**
+  A política trata a nota fiscal como universalmente disponível. Na prática,
+  fornecedores como hospedagem por aplicativo (d-013, Airbnb) e transporte
+  informal podem não emitir nota. A spec não diferencia fornecedores porque a
+  política não prevê essa distinção; acomodá-la exigiria regra específica
+  sobre formas alternativas de comprovação, que caberia ao RH definir.
