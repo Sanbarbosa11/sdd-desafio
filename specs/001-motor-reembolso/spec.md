@@ -1,28 +1,29 @@
 # Spec — Motor de Cálculo de Reembolso
 
-**Versão:** 1.0 · **Status:** rascunho · **Última alteração:** `<data>`
-
-> **Regra de ouro deste arquivo:** ele descreve o QUÊ e o PORQUÊ. Nenhuma linha
-> aqui pode citar linguagem, biblioteca, classe, função ou estrutura de pasta.
-> Se apareceu solução, o lugar dela é o `plan.md`.
->
-> **Teste de aceitação da própria spec:** uma pessoa que nunca viu o projeto
-> consegue, lendo só este arquivo, verificar se o sistema está correto?
+**Versão:** 1.0 · **Status:** completa · **Última alteração:** 2026-10-18
 
 ---
 
 ## 1. Problema
 
-<Duas ou três frases. Quem sofre hoje, com o quê, e por quê isso custa caro.>
+A empresa reembolsa as despesas de trabalho dos colaboradores, e hoje esse
+reembolso é decidido à mão: alguém do financeiro confere cada despesa contra a
+política do RH e devolve uma relação de aprovações e recusas. O processo é
+lento, e a política contém lacunas que cada conferente preenche à sua maneira
+— esta especificação identifica dezenove delas na §6 —, de modo que a mesma
+despesa pode receber decisões diferentes e nenhuma delas vem acompanhada de
+uma justificativa que o colaborador ou o auditor consigam verificar. O custo
+aparece em pagamentos indevidos, recusas injustas e retrabalho para contestar
+e reconferir.
 
 ## 2. Objetivo
 
-<Uma frase. O que passa a ser verdade quando isto existir.>
+Dadas as despesas de um colaborador em um período, o reembolso de cada
+despesa e do período é determinado sempre da mesma forma, por regras
+escritas, e cada resultado vem acompanhado das informações que permitem
+verificá-lo sem conhecer o sistema.
 
 ## 3. Fora de escopo
-
-<Lista explícita. Este bloco vale ponto: ele impede o agente de inventar feature
-e impede você de mover a trave depois.>
 
 - Não determina se o colaborador está em viagem, e portanto não aplica a
   ampliação de 50% prevista no item 6 da política. Ver AMB-007.
@@ -110,6 +111,14 @@ apresentação, e pertence ao plan.md.
 Não aparecem na saída o identificador, o nome e o centro de custo do
 colaborador, o rótulo de competência e a descrição das despesas: são
 informações que nenhuma regra utiliza (AMB-015).
+
+**Notação usada nesta spec.** Nos aceites e nos casos de borda, a lista de
+motivos de recusa é escrita entre colchetes, na ordem da §8 — por exemplo,
+motivos [FORA_DA_COMPETENCIA, SEM_NOTA_FISCAL]. Os códigos de motivo escritos
+em maiúsculas (FORA_DA_COMPETENCIA, CATEGORIA_INELEGIVEL, SEM_NOTA_FISCAL,
+DUPLICATA) são identificadores de negócio definidos por esta spec, não nomes
+de implementação. Nem os colchetes nem a grafia dos códigos prescrevem a
+forma da saída.
 
 **Consolidado do lote.**
 
@@ -260,7 +269,7 @@ interpretada. Uma despesa fora do período é recusada conforme a RN-006.
 **Origem:** política do RH, item 7; decisões AMB-008 e AMB-016
 **Depende de:** RN-006 (recusa por despesa fora do período).
 **Aceite:**
-- Arquivo de exemplo → período de 2026-07-01 a 2026-07-31, ambas as datas
+- Lote de exemplo → período de 2026-07-01 a 2026-07-31, ambas as datas
   incluídas.
 - d-014 (31/07, igual à data de fim) → dentro do período.
 - Despesa em 2026-07-01 (igual à data de início) → dentro do período.
@@ -496,10 +505,6 @@ apresentado na saída.
 ---
 
 ## 6. Ambiguidades identificadas e decisões
-
-> **Esta seção é o coração da spec e vale a maior parte dos 25 pontos do critério 1.**
-> Uma ambiguidade que você resolveu no código sem registrar aqui conta como
-> não resolvida.
 
 ### AMB-001 — Unidade de aplicação do limite por categoria
 
@@ -763,7 +768,7 @@ que o sistema não o determina, a segunda é a única posição que o motor
 consegue sustentar diante de uma auditoria.
 **Custo aceito:** o item 6 da política não é cumprido pelo motor, e o erro é
 sempre na mesma direção — contra o colaborador em viagem, nunca contra a
-empresa. No arquivo de exemplo, d-010 (hospedagem de 480,00 com nota)
+empresa. No lote de exemplo, d-010 (hospedagem de 480,00 com nota)
 recebe 250,00 em vez dos 375,00 que receberia se a diária fosse ampliada;
 a diferença é de 125,00. Despesas de
 alimentação e transporte de colaboradores efetivamente em viagem são
@@ -856,11 +861,11 @@ leituras o produzem de formas que o motor não consegue sustentar. A leitura
 escrever uma diária a mais na descrição vale R$ 250,00 de limite adicional,
 sem que nada na despesa mude — e é o mesmo motivo pelo qual a AMB-007
 rejeitou inferir viagem a partir de texto livre; o vocabulário é
-comprovadamente aberto, já que o próprio arquivo de exemplo usa duas
+comprovadamente aberto, já que o próprio lote de exemplo usa duas
 palavras distintas para a mesma coisa. A leitura (c) esvaziaria o item 3 da
 política: como o número de diárias seria sempre o suficiente para cobrir o
 valor, nenhuma hospedagem jamais excederia o limite. A leitura (d) estenderia
-um formato de entrada que o enunciado declara fixo, e no arquivo de exemplo
+um formato de entrada que o enunciado declara fixo, e no lote de exemplo
 o resultado dependeria inteiramente do valor padrão adotado. A leitura (a) é
 a única que produz o limite a partir de campos estruturados, é imune a
 redação, e converte o "por diária" da política em uma regra de lançamento
@@ -977,7 +982,7 @@ lançamentos pelo valor efetivo de cada um.
 
 **Texto original do RH:** não há; a política não menciona créditos, estornos
 ou devoluções.
-**O que não estava claro:** o arquivo de exemplo contém um lançamento de valor
+**O que não estava claro:** o lote de exemplo contém um lançamento de valor
 negativo descrito como estorno (d-009, −45,00), e era necessário decidir se
 ele seria ignorado, abatido do total do período, abatido do limite do dia, ou
 tratado de outra forma.
@@ -1054,7 +1059,7 @@ CATEGORIA_INELEGIVEL, já citado ali, passa a existir)
 
 **Texto original do RH:** não há. A política expressa seus limites em reais
 inteiros e não estabelece tratamento para valores com precisão inferior ao
-centavo. O arquivo de exemplo contém d-011 com valor 33,333.
+centavo. O lote de exemplo contém d-011 com valor 33,333.
 **O que não está claro:** duas questões. (i) como tratar um valor com mais de
 duas casas decimais — arredondar, truncar ou considerar dado inválido; (ii)
 em que momento a normalização ocorre: antes de qualquer regra, ou apenas
@@ -1103,8 +1108,8 @@ RN-009 (referências ao valor normalizado)
 
 ### AMB-015 — Campos da entrada sem regra associada
 
-**Texto original do RH:** não há. A entrada traz o campo centro_custo no
-objeto colaborador, e nenhum item da política o menciona. O mesmo vale para o
+**Texto original do RH:** não há. A entrada traz o centro de custo do
+colaborador, e nenhum item da política o menciona. O mesmo vale para o
 identificador e o nome do colaborador.
 **O que não está claro:** se esses campos afetam o cálculo, se devem ser
 reproduzidos na saída, e se são obrigatórios no contrato de entrada. As
@@ -1136,7 +1141,7 @@ custo — limites diferenciados, por exemplo — a spec precisará ser alterada
 para incorporar o campo. Hoje não há perda, pois nenhum resultado depende
 dele.
 **Consequências verificáveis:**
-- o centro de custo CC-ENG-PLATAFORMA do arquivo de exemplo não altera
+- o centro de custo CC-ENG-PLATAFORMA do lote de exemplo não altera
   nenhum resultado
 - um lote cujo colaborador não traga centro de custo é processado normalmente
 - dois lotes idênticos em tudo exceto o centro de custo produzem resultados
@@ -1154,33 +1159,36 @@ campos opcionais e obrigatoriedade do fornecedor)
 
 **Texto original do RH:** "Despesas devem ser lançadas dentro do período de
 competência." (item 7) A política não diz como o período é representado. A
-entrada traz três campos: competencia ("2026-07"), inicio ("2026-07-01") e
-fim ("2026-07-31").
-**O que não está claro:** duas questões independentes. (i) qual campo define
-o período quando há mais de um — competencia, o par inicio/fim, ou os três
-precisam concordar; (ii) se as datas de borda pertencem ao período.
-**Decisão:** o período é o intervalo definido por inicio e fim, com ambas as
-bordas inclusivas. Uma despesa cuja data seja igual a inicio ou igual a fim
-está dentro do período. O campo competencia é tratado como rótulo
-informativo e não participa da avaliação; divergência entre ele e o par
-inicio/fim não impede o processamento.
-**Justificativa:** o par inicio/fim é o dado mais expressivo — a competencia é
-derivável dele, mas o inverso não: um fechamento que vá de 26/06 a 25/07 não
-cabe em nenhum rótulo de mês. Exigir concordância entre os três campos
-faria da divergência um erro de lote (RN-010), e um engano de digitação no
-cabeçalho bloquearia o reembolso de todas as despesas do lote, custo alto
-para proteger contra algo que a entrada de referência não apresenta. Quanto às
-bordas, inicio e fim são datas sem hora, e "fim: 31/07" em linguagem corrente
-inclui o dia 31; adotar intervalo semiaberto faria o último dia de todo mês
-não pertencer a competência alguma, já que também não pertenceria à
-competência seguinte — o que não é convenção de intervalo, é perda de dia.
-**Custo aceito:** o campo competencia deixa de ter efeito sobre o cálculo. Um
-lote cujo rótulo diga "2026-07" mas cujo par de datas cubra agosto será
-processado como agosto, sem alerta. Aceito porque o par de datas é a
+entrada traz três informações sobre ele: um rótulo de competência com o ano e
+o mês ("2026-07"), uma data de início ("2026-07-01") e uma data de fim
+("2026-07-31").
+**O que não está claro:** duas questões independentes. (i) qual informação
+define o período quando há mais de uma — o rótulo de competência, o par de
+datas de início e de fim, ou as três precisam concordar; (ii) se as datas de
+borda pertencem ao período.
+**Decisão:** o período é o intervalo definido pelas datas de início e de fim,
+com ambas as bordas inclusivas. Uma despesa cuja data seja igual à data de
+início ou igual à data de fim está dentro do período. O rótulo de
+competência é tratado como informativo e não participa da avaliação;
+divergência entre ele e o par de datas não impede o processamento.
+**Justificativa:** o par de datas de início e de fim é o dado mais expressivo
+— o rótulo de competência é derivável dele, mas o inverso não: um fechamento
+que vá de 26/06 a 25/07 não cabe em nenhum rótulo de mês. Exigir concordância
+entre as três informações faria da divergência um erro de lote (RN-010), e um
+engano de digitação no cabeçalho bloquearia o reembolso de todas as despesas
+do lote, custo alto para proteger contra algo que a entrada de referência não
+apresenta. Quanto às bordas, as datas de início e de fim são datas sem hora,
+e "data de fim: 31/07" em linguagem corrente inclui o dia 31; adotar
+intervalo semiaberto faria o último dia de todo mês não pertencer a
+competência alguma, já que também não pertenceria à competência seguinte — o
+que não é convenção de intervalo, é perda de dia.
+**Custo aceito:** o rótulo de competência deixa de ter efeito sobre o
+cálculo. Um lote cujo rótulo diga "2026-07" mas cujo par de datas cubra
+agosto será processado como agosto, sem alerta. Aceito porque o par de datas é a
 representação precisa, e tratar a divergência como erro de lote (RN-010)
 bloquearia o lote inteiro por uma inconsistência que não impede a avaliação.
 **Consequências verificáveis:**
-- o período do arquivo de exemplo é [2026-07-01, 2026-07-31], ambas inclusivas
+- o período do lote de exemplo é [2026-07-01, 2026-07-31], ambas inclusivas
 - d-014 (31/07) está dentro do período; seu resultado segue para as demais
   regras
 - uma despesa em 2026-07-01 está dentro do período
@@ -1271,8 +1279,8 @@ demais. Reportar todas permite ao colaborador corrigir tudo de uma vez, em
 lugar de descobrir um problema por submissão. A decisão também simplifica a
 §8: a ordem das regras passa a tratar apenas do que afeta o valor
 reembolsado, não do que afeta o rótulo.
-**Custo aceito:** a representação da saída fica mais complexa, com uma lista
-no lugar de um valor escalar, e é necessário declarar a ordenação da lista
+**Custo aceito:** a representação da saída fica mais complexa, com vários
+motivos no lugar de um só, e é necessário declarar a ordenação da lista
 para que o resultado seja determinístico.
 **Consequências verificáveis:**
 - uma despesa de 150,00, sem nota fiscal, com data fora do período →
@@ -1345,11 +1353,9 @@ reapresentado com identificadores únicos.
 | Valor negativo (estorno) | d-009: 11/07, transporte urbano, −45,00, sem NF, "Estorno de corrida cancelada" | Erro de item (valor menor ou igual a zero); classificação erro; reembolso 0,00; não é avaliada por nenhuma regra de elegibilidade ou de valor; não abate nenhuma outra despesa | RN-010 |
 | Valor com mais de duas casas decimais | d-011: 15/07, alimentação, 33,333, com NF | Valor normalizado 33,33 (arredondamento, metade para cima) antes de qualquer regra; reembolso 33,33 (integral); a saída apresenta 33,33 | RN-011, RN-001 |
 | Categoria fora das três elegíveis | d-005: 07/07, "coworking", 89,00, com NF | Reembolso 0,00 (recusado), motivos [CATEGORIA_INELEGIVEL]; não é erro de entrada | RN-008 |
+| Despesa em dia não útil | d-012: 18/07 (sábado), alimentação, 47,20, com NF | Avaliada normalmente; nenhuma regra considera o dia da semana. Reembolso 47,20 (integral) | RN-001, RN-002 |
 
 ## 8. Ordem de aplicação das regras
-
-<Quando duas regras incidem sobre a mesma despesa, qual vale primeiro? A ordem
-muda o resultado. Declarar isso separa spec boa de spec média.>
 
 A avaliação tem três etapas:
 
@@ -1392,8 +1398,80 @@ da lista de motivos, para que a mesma entrada produza sempre a mesma saída
 
 O sistema está pronto quando:
 
-- [ ] <critério verificável, sem ler código>
-- [ ] <...>
+**Validação e normalização**
+
+- [ ] O lote é rejeitado — sem resultado por despesa nem consolidado, com
+  todas as causas detectáveis informadas — quando falta o período, quando a
+  data de início ou de fim falta ou é inválida, quando a data de início é
+  posterior à de fim, quando as despesas não são informadas ou quando há
+  identificador repetido (RN-010, RN-012, §4.2).
+- [ ] Uma despesa com informação obrigatória ausente, tipo incompatível, data
+  inexistente ou valor normalizado menor ou igual a zero recebe classificação
+  erro, reembolso 0,00, causa do erro e lista de motivos vazia, e as demais
+  despesas são processadas normalmente (RN-010; d-009).
+- [ ] Um lote sem despesas é válido, com total 0,00 e zero em todas as
+  classificações (RN-010).
+- [ ] Todo valor é normalizado para centavos, com a metade arredondada para
+  cima, antes de qualquer regra, e é esse valor que a saída apresenta
+  (RN-011; d-011).
+
+**Elegibilidade**
+
+- [ ] Uma despesa com data fora do intervalo de início a fim, ambos
+  incluídos, é recusada com FORA_DA_COMPETENCIA (RN-005, RN-006; d-008,
+  d-014).
+- [ ] A categoria é normalizada apenas quanto à caixa e aos espaços nas
+  extremidades, e qualquer categoria fora de alimentacao, transporte_urbano
+  e hospedagem é recusada com CATEGORIA_INELEGIVEL (RN-008; d-005, d-014).
+- [ ] A nota fiscal é exigida quando o valor normalizado excede 100,00; se
+  exigida e ausente, a despesa é recusada com SEM_NOTA_FISCAL (RN-003,
+  RN-004; d-003, d-004, d-013).
+- [ ] Despesas que coincidem em data, categoria e fornecedor normalizados e
+  valor normalizado formam grupo; mantém-se a de menor identificador pela
+  ordem dos códigos dos caracteres, e as demais recebem DUPLICATA; despesas
+  com outro motivo ou com erro não integram grupo (RN-009; d-006, d-007).
+- [ ] Todos os motivos de recusa aplicáveis são reportados, na ordem da §8, e
+  o reembolso parcial não é motivo (RN-007).
+
+**Valor**
+
+- [ ] Cada despesa é comparada isoladamente com o limite nominal da sua
+  categoria — 60,00, 80,00 ou 250,00 por lançamento —, sem soma entre
+  despesas e sem ampliação por viagem (RN-001; d-001, d-002, d-010).
+- [ ] Uma despesa acima do limite recebe o limite e é classificada como
+  parcial, com o excedente informado; uma despesa igual ao limite ou abaixo
+  dele é integral (RN-002).
+- [ ] Uma despesa recusada ou com erro não é avaliada contra o limite (§8).
+
+**Saída**
+
+- [ ] Cada despesa da entrada aparece exatamente uma vez, na ordem da
+  entrada, com as informações da §4.2 aplicáveis à sua classificação.
+- [ ] O consolidado traz o período, o total reembolsado — igual à soma dos
+  reembolsos — e a contagem por classificação, cuja soma é igual ao número
+  de despesas (§4.2).
+- [ ] A mesma entrada produz sempre a mesma saída, e inverter a ordem das
+  despesas não altera o resultado de nenhuma delas (RN-001, RN-009,
+  AMB-018).
+- [ ] As informações sem regra associada não alteram nenhum resultado e não
+  aparecem na saída (§3, AMB-015).
+
+**Conformidade**
+
+- [ ] Todos os aceites das RN-001 a RN-012 e todos os casos de borda da §7
+  são satisfeitos.
+- [ ] O lote de exemplo produz exatamente estes resultados:
+
+| d-001 | d-002 | d-003 | d-004 | d-005 | d-006 | d-007 |
+|---|---|---|---|---|---|---|
+| 60,00 parcial | 38,00 integral | 80,00 parcial | 0,00 recusada [SEM_NOTA_FISCAL] | 0,00 recusada [CATEGORIA_INELEGIVEL] | 54,90 integral | 0,00 recusada [DUPLICATA] |
+
+| d-008 | d-009 | d-010 | d-011 | d-012 | d-013 | d-014 |
+|---|---|---|---|---|---|---|
+| 0,00 recusada [FORA_DA_COMPETENCIA] | 0,00 erro | 250,00 parcial | 33,33 integral | 47,20 integral | 0,00 recusada [SEM_NOTA_FISCAL] | 60,00 parcial |
+
+  Consolidado: total reembolsado 623,43; 4 integrais, 4 parciais, 5
+  recusadas, 1 erro; 14 despesas.
 
 ## 10. O que fica em aberto
 
@@ -1413,3 +1491,8 @@ O sistema está pronto quando:
   pelo processo que autoriza a viagem — não pelo colaborador que lança a
   despesa. Enquanto isso não existir, colaboradores em viagem recebem menos
   do que a política lhes garante, e a regularização cabe ao financeiro.
+- **Dia útil e dia não útil (origem: §7, d-012).** A política não distingue
+  despesas em dia útil de despesas em fim de semana ou feriado, e esta spec
+  também não o faz: o dia da semana não é considerado por nenhuma regra. Se o
+  RH pretende tratamento diferente para dias não úteis — exigir justificativa
+  para plantão, por exemplo —, a política precisaria estabelecê-lo.

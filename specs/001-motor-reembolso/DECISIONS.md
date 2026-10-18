@@ -10,6 +10,50 @@ Ordem cronológica inversa: a mais recente primeiro.
 
 ---
 
+## D-008 — Fechamento: §1, §2 e §9 escritas; vazamentos e andaime do template removidos · `2026-10-18`
+
+**Gatilho:** o fechamento da spec — redação das seções que permaneciam no
+modelo — e uma varredura por menções a implementação ou formato.
+
+**O que mudou na spec:**
+- Cabeçalho: status de "rascunho" para "completa"; última alteração de
+  `<data>` para 2026-10-18. Removidos os blocos "Regra de ouro" e "Teste de
+  aceitação da própria spec", instruções do template.
+- §1 e §2: de modelo vazio para o problema e o objetivo.
+- §3, §6 e §8: removidos os comentários do template.
+- §4.2: acrescentada a notação — colchetes para a lista de motivos e códigos
+  de motivo como identificadores de negócio, sem prescrição de formato.
+- §7: acrescentado o caso d-012 (despesa em dia não útil).
+- §9: de modelo vazio para os critérios de aceite, derivados das RN-001 a
+  RN-012, da §4 e da §7, incluindo o resultado esperado do lote de exemplo.
+- §10: acrescentado "Dia útil e dia não útil".
+- AMB-015, Texto do RH: de "o campo centro_custo no objeto colaborador" para
+  "o centro de custo do colaborador".
+- AMB-016, Texto do RH, O que não está claro, Decisão, Justificativa e Custo
+  aceito: de "competencia", "inicio", "fim", "o par inicio/fim" e "o campo
+  competencia" para "rótulo de competência", "data de início", "data de
+  fim" e "o par de datas", preservando a distinção entre as três
+  informações de que a decisão trata.
+- AMB-018, Custo aceito: de "uma lista no lugar de um valor escalar" para
+  "vários motivos no lugar de um só".
+- RN-005, AMB-007, AMB-009, AMB-012, AMB-014, AMB-015 e AMB-016: de "arquivo
+  de exemplo" para "lote de exemplo".
+
+**Por quê:** a spec descreve o quê e o porquê, nunca a forma. Nomes de campo
+da representação da entrada, "objeto", "valor escalar" e "arquivo"
+descrevem a forma; comentários de template sinalizam documento não
+finalizado e cujas instruções já foram cumpridas. O caso d-012 existia no
+lote de exemplo, mas seu resultado dependia de uma ausência de regra que a
+spec nunca declarava.
+
+**O que isso invalidou:** nenhum critério de aceite.
+
+**Tasks afetadas:** nenhuma — tasks.md ainda não foi escrito.
+
+**Custo:** 1 arquivo, correção pontual.
+
+---
+
 ## D-007 — Contrato de entrada e saída declarados na §4; validação estendida · `2026-10-18`
 
 **Gatilho:** a redação da §4 resolveu a pendência "Contrato de entrada e
