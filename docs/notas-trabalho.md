@@ -68,6 +68,19 @@ hotel indistinguíveis de uma duplicata, que é exatamente o par d-006/d-007
 do exemplo. Nenhuma varredura por texto acharia isso; ele inferiu a partir
 do efeito da decisão. Registrei na §10 como dependência para a AMB-011.
 
+19/10 — Antes de implementar as regras de negócio, lancei um subagente
+general-purpose para revisar a spec com contexto limpo, sem ter participado
+de nenhuma decisão. Achou 14 itens em quatro categorias. Quatro mudavam
+resultado: a AMB-013 listava as categorias elegíveis com acento, justamente
+a grafia que ela torna inelegível; a decisão da AMB-020 sobre causa única
+não chegou a nenhuma regra; a frase "não participa de nenhuma comparação"
+conflitava com a RN-012; e "códigos dos caracteres" na RN-009 não definia se
+eram code points ou unidades UTF-16 — quem decidiu isso foi o plan.md, que
+é regra de negócio fora da spec. Este último o próprio subagente classificou
+como vazamento técnico de gravidade baixa; a sessão principal discordou e o
+reclassificou como indeterminação de gravidade média, o que eu confirmei.
+Nenhuma dessas quatro teria sido encontrada pela sessão que escreveu a spec.
+
 ## Erros do agente
 18/10 — AMB-004: o agente afirmou que, no arquivo de exemplo, nenhuma
 despesa passa de R$ 100 antes do corte e fica abaixo depois — logo a AMB-006
