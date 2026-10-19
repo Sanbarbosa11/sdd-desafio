@@ -166,7 +166,7 @@ Todos os testes desta fase constroem `LoteLido` direto, sem JSON (plan §6).
     `RN-006 despesa em 2026-08-01 com NF → recusada com FORA_DA_COMPETENCIA`
   - **Commit:** —
 
-- [ ] **T-010** — Normalização de categoria e fornecedor (`aparar()` +
+- [x] **T-010** — Normalização de categoria e fornecedor (`aparar()` +
   `lowercase()`) na construção de `Despesa`; etapa 1.2 da §8: elegibilidade
   da categoria.
   - **Atende:** RN-008, AMB-013, AMB-017

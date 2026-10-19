@@ -29,8 +29,8 @@ fun validarDespesa(lida: ElementoLido.DespesaLida, posicao: Int): ItemValidado {
 
     val id = texto(lida.id, CampoDespesa.IDENTIFICADOR, causas)
     val data = valorDe(lida.data, CampoDespesa.DATA, causas)
-    val categoria = texto(lida.categoria, CampoDespesa.CATEGORIA, causas)
-    val fornecedor = texto(lida.fornecedor, CampoDespesa.FORNECEDOR, causas)
+    val categoria = texto(lida.categoria, CampoDespesa.CATEGORIA, causas)?.let(::normalizarTermo)
+    val fornecedor = texto(lida.fornecedor, CampoDespesa.FORNECEDOR, causas)?.let(::normalizarTermo)
     // RN-011: normaliza antes da validação de faixa.
     val valor = valorDe(lida.valor, CampoDespesa.VALOR, causas)?.let(Valor::normalizar)
     if (valor != null && valor.decimal.signum() <= 0) {
@@ -56,6 +56,11 @@ private fun <T> valorDe(lido: Lido<T>, campo: CampoDespesa, causas: MutableList<
     causas += CausaErro(campo, falha)
     return null
 }
+
+// RN-008: categoria e fornecedor em minúsculas pelo mapeamento completo de caixa do Unicode,
+// independente de localidade — lowercase() do Kotlin usa Locale.ROOT (DT-005). O identificador
+// não passa por aqui: normaliza-se o que é termo de negócio, não o que é chave (RN-012).
+private fun normalizarTermo(aparado: String): String = aparado.lowercase()
 
 // §4.1: texto obrigatório vazio após aparar() é tratado como ausente.
 private fun texto(lido: Lido<String>, campo: CampoDespesa, causas: MutableList<CausaErro>): String? {

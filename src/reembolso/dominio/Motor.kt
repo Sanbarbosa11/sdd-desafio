@@ -29,12 +29,13 @@ object Motor {
         val motivos = mutableListOf<Motivo>()
         // 1.1 Pertinência ao período (RN-005, RN-006).
         if (despesa.data !in periodo) motivos += Motivo.FORA_DA_COMPETENCIA
-        // 1.2 a 1.4 entram nas T-010 a T-013.
+        // 1.2 Elegibilidade da categoria, já normalizada (RN-008).
         val categoria = Categoria.porCodigo(despesa.categoria)
-            ?: TODO("T-010: categoria inelegível é recusada com CATEGORIA_INELEGIVEL (RN-008)")
+        if (categoria == null) motivos += Motivo.CATEGORIA_INELEGIVEL
+        // 1.3 e 1.4 entram nas T-011 e T-013.
 
         // Com qualquer motivo, reembolso 0,00 e nenhuma avaliação contra o limite (§8, etapa 2).
-        if (motivos.isNotEmpty()) return recusar(despesa, motivos)
+        if (motivos.isNotEmpty() || categoria == null) return recusar(despesa, motivos)
 
         // Etapa 2 (valor).
         return avaliarValor(despesa, categoria)
