@@ -14,6 +14,7 @@ class OrdemCamposSecao41Test {
         "Descrição" to null,
         "Fornecedor" to CampoDespesa.FORNECEDOR,
         "Valor" to CampoDespesa.VALOR,
+        "Moeda" to CampoDespesa.MOEDA,
         "Nota fiscal apresentada" to CampoDespesa.NOTA_FISCAL,
     )
 

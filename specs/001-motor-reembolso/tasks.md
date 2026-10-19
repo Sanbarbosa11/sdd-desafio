@@ -411,11 +411,14 @@ já tem a moeda; `CampoDespesa` ainda não).
     faz o `OrdemCamposSecao41Test` rodar e falhar.
   - **Commit:** —
 
-- [ ] **T-023** — Modelo v2 (plan §3, versão 2.0): `CampoDespesa.MOEDA` entre
-  `VALOR` e `NOTA_FISCAL`; `Falha.MOEDA_SEM_COTACAO`; causas de lote
-  `PoliticaInvalida` e `CotacoesInvalidas`; `LoteLido` com o centro de custo
-  e `DespesaLida` com a moeda, como `Lido<String>`.
-  - **Atende:** AMB-021, AMB-029, AMB-033, AMB-037; RN-010
+- [x] **T-023** — `CampoDespesa.MOEDA` entre `VALOR` e `NOTA_FISCAL`, na ordem
+  da tabela de despesa da §4.1 da spec 2.0.
+  - **Escopo reduzido ao campo:** o teste de ordem precisa só dele. Os demais
+    itens do modelo v2 foram para as tasks que os usam: `Falha.MOEDA_SEM_COTACAO`
+    e a moeda em `DespesaLida` para a T-025; o centro de custo em `LoteLido` para
+    a T-024; as causas de lote `PoliticaInvalida` e `CotacoesInvalidas` para a
+    T-027.
+  - **Atende:** AMB-021; §4.1
   - **Aceite:** passam
     `OrdemCamposSecao41Test` › `§4-1 AMB-021 ordem de CampoDespesa é a ordem da tabela de despesa da spec`,
     com "Moeda" → `MOEDA` na correspondência, e
@@ -430,6 +433,7 @@ já tem a moeda; `CampoDespesa` ainda não).
   traz a tabela aplicada. Uma política de teste com a tabela padrão 60,00,
   80,00 e 250,00 mantém verdes os testes das T-001 a T-013, que constroem
   lotes sem centro de custo.
+  - **Inclui, vindo da T-023:** o centro de custo em `LoteLido`, como `Lido<String>`.
   - **Atende:** RN-013, RN-001, RN-002, RN-008, AMB-022, AMB-023, AMB-024,
     AMB-025, AMB-026, AMB-034, AMB-035
   - **Aceite:** `RN013TabelaAplicavelTest` passa, e os testes anteriores continuam passando:
@@ -452,6 +456,7 @@ já tem a moeda; `CampoDespesa` ainda não).
 - [ ] **T-025** — RN-014: conversão para reais na etapa 0, antes da RN-011 (§8):
   valor lançado × cotação da data ou da anterior mais recente, normalizado uma
   vez; moeda sem cotação aplicável e moeda inválida como erro de item.
+  - **Inclui, vindo da T-023:** `Falha.MOEDA_SEM_COTACAO` e a moeda em `DespesaLida`, como `Lido<String>`.
   - **Atende:** RN-014, RN-011, RN-010, AMB-027, AMB-028, AMB-029, AMB-030,
     AMB-033, AMB-034
   - **Aceite:** `RN014ConversaoTest` passa:
@@ -485,6 +490,7 @@ já tem a moeda; `CampoDespesa` ainda não).
 
 - [ ] **T-027** — RN-010, erro de lote: política e cotações inválidas, com as
   demais causas detectáveis.
+  - **Inclui, vindo da T-023:** as causas de lote `PoliticaInvalida` e `CotacoesInvalidas`.
   - **Atende:** RN-010, AMB-037
   - **Aceite:** `RN010ValidacaoDeLoteTest` passa, além dos testes da T-005:
     `RN-010 AMB-037 política sem tabela padrão, sem limiar ou com limite negativo → lote rejeitado`,
