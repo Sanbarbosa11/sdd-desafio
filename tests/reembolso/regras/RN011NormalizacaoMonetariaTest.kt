@@ -3,6 +3,7 @@ package reembolso.regras
 import java.math.BigDecimal
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import reembolso.dominio.Valor
 
 class RN011NormalizacaoMonetariaTest {
@@ -32,5 +33,24 @@ class RN011NormalizacaoMonetariaTest {
         assertEquals(a, b)
         assertEquals(a.hashCode(), b.hashCode())
         assertEquals("54.90", b.decimal.toPlainString())
+    }
+
+    // Aceites que passam a ser verificáveis com a etapa de valor (T-008).
+
+    @Test
+    fun `RN-011 d-011 33,333 → reembolso 33,33 integral`() {
+        val d = avaliar(despesa("d-011", "2026-07-15", "alimentacao", "Hotel Copa Sul", "33.333", nf = true))
+            .aceita("d-011")
+        assertEquals("33.33", d.valor.decimal.toPlainString())
+        assertEquals("33.33", d.reembolsado.decimal.toPlainString())
+        assertNull(d.excedente)
+    }
+
+    @Test
+    fun `RN-011 alimentacao de 60,004 → reembolso 60,00 integral`() {
+        val d = avaliar(despesa("x", "2026-07-15", "alimentacao", "Bistro Central", "60.004", nf = true)).aceita("x")
+        assertEquals("60.00", d.valor.decimal.toPlainString())
+        assertEquals("60.00", d.reembolsado.decimal.toPlainString())
+        assertNull(d.excedente)
     }
 }

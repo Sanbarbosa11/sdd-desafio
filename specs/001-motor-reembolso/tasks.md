@@ -131,7 +131,7 @@ Todos os testes desta fase constroem `LoteLido` direto, sem JSON (plan §6).
     `RN-012 AMB-020 identificador com espaços nas extremidades é considerado aparado`
   - **Commit:** —
 
-- [ ] **T-008** — `Motor.avaliar` com a etapa 2 (valor) da §8: limite nominal
+- [x] **T-008** — `Motor.avaliar` com a etapa 2 (valor) da §8: limite nominal
   por despesa via `limiteAplicavel`, reembolso parcial com excedente.
   - **Atende:** RN-001, RN-002, RN-011, AMB-001, AMB-002, AMB-003 (dissolvida), AMB-007, AMB-009
   - **Aceite:** `RN001LimitePorDespesaTest` e `RN002ReembolsoParcialTest` passam,
