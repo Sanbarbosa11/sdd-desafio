@@ -32,7 +32,7 @@
 
 ## Fase 1 — Fundação
 
-- [ ] **T-001** — Configurar o ambiente (R-01): `JAVA_HOME` apontando para o
+- [x] **T-001** — Configurar o ambiente (R-01): `JAVA_HOME` apontando para o
   JDK 21 do Android Studio; Gradle Wrapper 8.11.1 gerado a partir da
   distribuição do cache e versionado; `build.gradle.kts` com Kotlin 2.0.21,
   plugin `application`, alvo Java 17 (`jvmTarget`, `-Xjdk-release=17`,
