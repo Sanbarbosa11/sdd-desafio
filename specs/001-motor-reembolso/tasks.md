@@ -99,7 +99,7 @@ Todos os testes desta fase constroem `LoteLido` direto, sem JSON (plan §6).
     `RN-012 identificadores d-001 a d-014 distintos → sem erro de lote`
   - **Commit:** —
 
-- [ ] **T-006** — Validação de item, campos: informação obrigatória ausente,
+- [x] **T-006** — Validação de item, campos: informação obrigatória ausente,
   tipo incompatível, data inexistente, texto obrigatório vazio após `aparar()`
   tratado como ausente, valor normalizado menor ou igual a zero. Todas as
   causas, na ordem de `CampoDespesa`.
