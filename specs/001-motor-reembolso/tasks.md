@@ -1,6 +1,6 @@
 # Tasks — Motor de Cálculo de Reembolso
 
-**Baseado em:** spec 1.1 · plan 1.1
+**Baseado em:** spec 1.2 · plan 1.1
 
 > Cada task é pequena o bastante para virar **um commit**. Se você não consegue
 > descrever o critério de aceite como "o teste X passa", a task está grande demais.

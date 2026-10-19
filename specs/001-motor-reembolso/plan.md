@@ -1,6 +1,6 @@
 # Plano Técnico — Motor de Cálculo de Reembolso
 
-**Versão:** 1.1 · **Baseado na spec:** 1.1
+**Versão:** 1.1 · **Baseado na spec:** 1.2
 
 > Aqui mora o COMO. Este arquivo pode e deve falar de linguagem, biblioteca e
 > arquitetura. O que ele **não** pode é introduzir regra de negócio nova — se
@@ -346,7 +346,8 @@ despesas sem motivo. Em cada grupo de tamanho maior que 1, mantém a de menor
 identificador e marca as demais com `DUPLICATA` e `mantida`. "Menor" é
 comparado por **code point Unicode**, com um comparador próprio, porque o
 `String.compareTo` do Kotlin compara unidades UTF-16 e diverge fora do BMP.
-"Códigos dos caracteres" (RN-009) é code point.
+A RN-009 fixa a comparação pelo ponto de código Unicode (spec 1.2, D-010);
+esta DT implementa a regra, não a decide.
 **Alternativa descartada:** comparar cada despesa com as anteriores na ordem
 da entrada, o que torna o resultado dependente da ordem e viola a RN-001 e a
 RN-009.
