@@ -1,10 +1,5 @@
 # CLAUDE.md
 
-> Este arquivo é lido pelo Claude Code no início de toda sessão. É onde moram as
-> convenções que você não quer repetir em todo prompt.
-> Substitua os `<...>` e apague o que não usar. Mantenha curto — CLAUDE.md longo
-> é CLAUDE.md ignorado.
-
 ## O projeto
 
 Motor de cálculo de reembolso de despesas corporativas. CLI que lê um JSON de
