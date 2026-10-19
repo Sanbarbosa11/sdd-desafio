@@ -10,6 +10,79 @@ Ordem cronológica inversa: a mais recente primeiro.
 
 ---
 
+## D-011 — Conversão de caixa: mapeamento completo do Unicode, independente de localidade · `2026-10-19`
+
+**Gatilho:** a leitura da RN-008 antes da T-010. A spec dizia apenas que
+"letras maiúsculas são convertidas em minúsculas", sem dizer se a conversão
+depende da localidade do ambiente nem se é feita caractere a caractere
+(mapeamento simples) ou com o mapeamento completo do padrão Unicode, que
+pode produzir mais de um caractere e depender da posição. As duas questões
+mudam resultado, e a primeira alcança um caso da própria spec: na
+localidade turca, "ALIMENTACAO" vira "alımentacao" (U+0131) e d-014 seria
+recusada. Verificado no JDK do projeto antes de escrever código. O plan já
+tinha escolhido (DT-005: `lowercase()` do Kotlin, independente de
+localidade), o que é regra de negócio decidida fora da spec — mesma classe
+do achado D4 da D-010.
+
+**O que mudou na spec (versão 1.2 → 1.3):**
+- RN-008, Regra: dois parágrafos novos — a conversão usa o mapeamento
+  completo de caixa do padrão Unicode, independente da localidade; o que
+  "independente de localidade" e "mapeamento completo" significam, com o
+  sigma final (U+03A3 → U+03C2 quando precedido de letra e não seguido de
+  letra, U+03C3 nas demais posições).
+- RN-008, Aceite: quatro casos acrescentados — "ALIMENTACAO" em qualquer
+  localidade; fornecedores "ΟΔΟΣ" e "Οδος" com a mesma chave; "ALİMENTACAO"
+  (U+0130) inelegível; duas alimentações com fornecedores "ΟΔΟΣ" e "Οδος"
+  formam grupo de duplicatas.
+- AMB-013, Decisão: a conversão remete ao mapeamento completo e à
+  independência de localidade da RN-008.
+
+**Classificação:** esclarecimento. A AMB-013 já decidia converter a caixa e
+manter o alcance estreito; faltava declarar o alcance do termo "converter".
+
+**Alternativas consideradas:** (a) mapeamento simples, caractere a
+caractere, independente de localidade; (c) converter apenas A–Z. A (c) foi
+descartada porque "BISTRÔ CENTRAL" e "Bistrô Central" seriam fornecedores
+distintos. Entre (a) e o mapeamento completo, adotado o completo: respeita a
+grafia da língua (sigma final), de modo que "ΟΔΟΣ" e "Οδος" são o mesmo
+fornecedor — com o simples seriam chaves distintas e uma duplicata deixaria
+de ser detectada. Custo aceito: "ALİMENTACAO" (U+0130) vira "ali̇mentacao" e
+é inelegível; U+0130 é caractere distinto de U+0049, e igualá-los seria
+inferir a intenção de quem digitou, contra o alcance estreito da AMB-013.
+
+**Correção no caso de aceite proposto:** o caso foi proposto com duas
+despesas de **categoria** "ΟΔΟΣ" e "Οδος" formando grupo de duplicatas. Pela
+RN-009, despesa de categoria inelegível não integra grupo — as duas seriam
+recusadas por CATEGORIA_INELEGIVEL, sem DUPLICATA. O caso foi registrado com
+"ΟΔΟΣ" e "Οδος" como **fornecedor**, em categoria elegível, coerente com a
+consequência que trata o grego como chave de fornecedor.
+
+**Ajuste de precisão da redação:** o texto proposto dizia que o sigma
+"convertido no fim de uma palavra" produz o sigma final. A condição do
+padrão Unicode é outra: o sigma final aparece quando o sigma é precedido de
+letra e não seguido de letra — um "Σ" isolado está no fim de uma palavra e
+produz o sigma comum. A redação foi trocada para "convertido quando
+precedido de letra e não seguido de letra". Não é mudança de decisão: a
+regra continua sendo o mapeamento completo do padrão Unicode, e a frase
+apenas descreve com exatidão o que esse mapeamento faz.
+
+**Por quê:** decidir a conversão no código seria introduzir regra de negócio
+fora da spec, e a dependência de localidade faria o mesmo lote produzir
+resultados diferentes conforme a máquina.
+
+**O que isso invalidou:** nenhum critério de aceite. O lote de exemplo é o
+mesmo em qualquer localidade.
+
+**Tasks afetadas:** T-010 (os quatro casos novos entram no
+`RN008CategoriaTest`) e T-013 (o grupo de duplicatas com fornecedores
+gregos é verificável na RN-009). A DT-005 do plan já implementa a escolha
+(`lowercase()` do Kotlin = mapeamento completo, `Locale.ROOT`); passa a
+implementar a RN-008 em vez de decidi-la.
+
+**Custo:** 2 arquivos (spec.md, DECISIONS.md), correção pontual.
+
+---
+
 ## D-010 — Achados de revisão independente da spec antes das regras de negócio · `2026-10-18`
 
 **Gatilho:** revisão independente da spec 1.1 por um subagente com contexto

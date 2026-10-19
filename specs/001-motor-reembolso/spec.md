@@ -1,6 +1,6 @@
 # Spec — Motor de Cálculo de Reembolso
 
-**Versão:** 1.2 · **Status:** completa · **Última alteração:** 2026-10-18
+**Versão:** 1.3 · **Status:** completa · **Última alteração:** 2026-10-19
 
 ---
 
@@ -350,8 +350,24 @@ motivos de recusa vazia: erro não é recusa (RN-010).
 **Regra:** antes de qualquer comparação, a categoria e o fornecedor de cada
 despesa são normalizados: letras maiúsculas são convertidas em minúsculas e
 espaços nas extremidades, no alcance declarado na §4.1, são removidos.
-Nenhuma outra transformação é aplicada — acentuação, separadores e sinônimos não são normalizados. Toda
-regra que compara categorias ou fornecedores usa os valores normalizados.
+Nenhuma outra transformação é aplicada — acentuação, separadores e
+sinônimos não são normalizados. Toda regra que compara categorias ou
+fornecedores usa os valores normalizados.
+
+A conversão de maiúsculas em minúsculas usa o mapeamento completo de caixa
+definido pelo padrão Unicode, independente da localidade do ambiente de
+execução. Independente de localidade significa que a mesma entrada produz a
+mesma saída em qualquer máquina, qualquer idioma de sistema e qualquer
+configuração regional: o mapeamento é o do padrão Unicode, não o do idioma
+do usuário.
+
+Mapeamento completo significa que um caractere pode ser convertido em mais
+de um, e que a conversão pode depender da posição do caractere na palavra.
+Isso é intencional: é o que faz a conversão respeitar a grafia da língua. O
+sigma grego maiúsculo (U+03A3) convertido quando precedido de letra e não
+seguido de letra produz o sigma final (U+03C2), que é a forma correta em
+grego; convertido em qualquer outra posição produz o sigma comum (U+03C3).
+
 As categorias elegíveis são
 exatamente três: alimentacao, transporte_urbano e hospedagem. Uma despesa
 cuja categoria normalizada seja qualquer outra é recusada, com o motivo
@@ -371,6 +387,21 @@ CATEGORIA_INELEGIVEL na sua lista de motivos (RN-007).
   motivos [CATEGORIA_INELEGIVEL].
 - Fornecedores "Bistro Central", "BISTRO CENTRAL" e " Bistro Central " → o
   mesmo fornecedor; "Bistrô Central" → fornecedor distinto.
+- "ALIMENTACAO" → alimentacao em qualquer localidade, inclusive turca e
+  azerbaijana, onde a conversão dependente de localidade produziria
+  alımentacao (U+0131, i sem ponto) e tornaria a despesa inelegível. O caso
+  d-014 da §9 depende desta garantia.
+- Fornecedores "ΟΔΟΣ" e "Οδος" → a mesma chave, οδος; são o mesmo fornecedor
+  para a RN-009. Com mapeamento simples produziriam οδοσ e οδος, chaves
+  distintas, e um grupo de duplicatas deixaria de ser detectado.
+- "ALİMENTACAO" (U+0130, I turco com ponto) → ali̇mentacao, com o ponto como
+  caractere combinante separado (U+0307), que não é nenhuma das três
+  categorias elegíveis; recusada, motivos [CATEGORIA_INELEGIVEL]. Isso é
+  intencional: U+0130 é um caractere distinto de U+0049, e tratá-los como
+  iguais seria o motor adivinhando a intenção de quem digitou, contra o
+  alcance estreito decidido na AMB-013.
+- Duas despesas de alimentação no mesmo dia e de mesmo valor, com
+  fornecedores "ΟΔΟΣ" e "Οδος" → grupo de duplicatas pela RN-009.
 
 ### RN-009 — Duplicidade
 
@@ -1096,7 +1127,9 @@ distingue maiúsculas de minúsculas, já que d-014 traz "ALIMENTACAO"; (ii) se
 as três categorias nomeadas esgotam as elegíveis, ou se são apenas aquelas
 que possuem limite, podendo haver outras elegíveis sem teto.
 **Decisão:** a categoria é normalizada antes da comparação, convertendo-se
-maiúsculas em minúsculas e removendo-se espaços nas extremidades. Nenhuma
+maiúsculas em minúsculas — pelo mapeamento completo de caixa do padrão
+Unicode, independente de localidade (RN-008) — e removendo-se espaços nas
+extremidades. Nenhuma
 outra transformação é aplicada: acentuação, separadores e sinônimos não são
 normalizados. As categorias elegíveis são exatamente três — alimentacao,
 transporte_urbano e hospedagem, na grafia do vocabulário de categoria
