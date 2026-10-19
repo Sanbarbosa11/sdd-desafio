@@ -10,6 +10,154 @@ Ordem cronológica inversa: a mais recente primeiro.
 
 ---
 
+## D-012 — Envelope do Dia 2: Política de Reembolso v4 · `2026-10-19`
+
+**Gatilho:** o envelope lacrado do Dia 2 (`exemplos/envelope/`, commit
+`2aed7d1`), com o comunicado do RH da política v4: (A) limites por centro de
+custo, lidos de uma política externa (`politica-v4.json`); (B) despesas em
+moeda estrangeira, convertidas pela taxa da data da despesa (`cambio.json`);
+(C, opcional) fila de aprovação manual acima de R$ 500,00. Vigência imediata,
+retroativa à competência atual. A análise foi feita antes de qualquer
+mudança na spec e está em `docs/analise-envelope.md`; ela identificou o que
+quebrava, dezoito pontos em aberto e o que a arquitetura absorvia. As
+decisões foram tomadas pelo autor em bloco e escritas na spec 2.0.
+
+**Achado que mais pesou:** o lote do Dia 1 (`exemplos/despesas-exemplo.json`)
+é do centro de custo CC-ENG-PLATAFORMA, e a v4 é retroativa à sua
+competência. Sob a tabela desse centro (alimentação 75,00, hospedagem 0,00),
+o resultado da §9 deixou de ser o que a spec 1.3 declarava: total 386,93 em
+vez de 623,43.
+
+**O que mudou na spec (versão 1.3 → 2.0):**
+- §6: dezessete AMB novas, AMB-022 a AMB-038. Política padrão (022, 023,
+  024), comparação do centro de custo (025), limite 0,00 (026), cotação na
+  data e fora da faixa (027, 028), moeda sem cotação (029), ordem
+  conversão-normalização (030), limiar de nota fiscal e chave de
+  duplicidade em reais (031, 032), moeda inválida (033), viagem (034),
+  periodicidade (035), versionamento (036), política ou cotações inválidas
+  (037), item C (038). O ponto P5 da análise (representação sob a política
+  padrão) decorre da AMB-023 e entrou como consequência dela, não como AMB
+  própria. §1: de "vinte e uma" para "trinta e oito".
+- RN novas: RN-013 (tabela de limites aplicável ao lote) e RN-014 (conversão
+  para reais).
+- RN-001: limites da tabela aplicável, não mais fixos no texto; aceites com
+  e-007 e com o lote de exemplo sob o CC-ENG-PLATAFORMA.
+- RN-002: limite da tabela aplicável; aceites com e-008 e e-002.
+- RN-003: limiar de nota fiscal lido da política e comparado em reais;
+  título de "acima de R$ 100,00" para "acima do limiar da política"; aceites
+  com e-005 e e-003.
+- RN-004: aceite de d-013 sob o CC-ENG-PLATAFORMA e de e-005.
+- RN-008: elegíveis são as categorias da tabela aplicável com limite maior
+  que zero, não mais "exatamente três"; aceites com e-001, f-003, e-009 e
+  d-014 sob o CC-ENG-PLATAFORMA.
+- RN-009: valor da chave em reais.
+- RN-010: causas de lote para política e cotações inválidas; causa de item
+  "moeda sem cotação"; moeda inválida é erro mesmo sendo campo opcional;
+  centro de custo com tipo incompatível leva à tabela padrão; sete aceites
+  novos.
+- RN-011: normaliza o valor em reais, uma vez, depois da conversão; aceite
+  com 33,333 EUR.
+- §3: o centro de custo sai da lista de campos sem efeito; entram o item C e
+  o versionamento de política como fora de escopo.
+- §4.1: o lote é avaliado contra a política e as cotações; centro de custo
+  com efeito; campo moeda na tabela de despesa; exceção à AMB-015 para a
+  moeda; política e cotações descritas.
+- §4.2: valor considerado em reais; valor e moeda originais e cotação usada
+  na saída; tabela aplicada no consolidado; causa nova; vocabulário com
+  representacao, centros de custo e moedas; convenção "Despesas do lote de
+  exemplo nos aceites".
+- §5 e §7, premissa: "limites nominais" passa a "limites da tabela
+  aplicável".
+- §7: seis casos novos (e-001/f-003, d-010 sob CC-ENG-PLATAFORMA, e-002,
+  e-004, e-005, e-006); de 20 para 26 linhas.
+- §8, etapa 0: seleção da tabela, conversão, normalização e validação, nessa
+  ordem, com a justificativa da conversão antes da normalização.
+- §9: critérios de conversão e de tabela aplicável; resultado do lote de
+  exemplo refeito sob o CC-ENG-PLATAFORMA (386,93; 6 integrais, 1 parcial,
+  6 recusadas, 1 erro); resultados esperados dos dois lotes do envelope
+  (1.143,26 e 373,76).
+- §10: viagem atualizada; versionamento de política, item C e centro de
+  custo com outra caixa como pontos em aberto.
+- AMB-007: decisão mantida pela AMB-034 e redigida sem "limites nominais".
+- AMB-013: elegíveis são as da tabela aplicável.
+- AMB-015: o centro de custo sai da decisão, com registro da revisão; a moeda
+  não segue a decisão (AMB-033); consequências sobre o centro de custo
+  removidas.
+
+**Como as decisões foram tomadas:** o autor decidiu os dezoito pontos em
+bloco. Na escrita, o agente divergiu do texto ditado em três pontos e
+escreveu a versão coerente, com o aviso registrado antes da escrita:
+- **Posição da conversão na §8.** O texto ditado punha a conversão "depois
+  da RN-011". Isso normalizaria o valor lançado e depois o convertido, o
+  duplo arredondamento que a AMB-030 (T4) rejeita. A §8 foi escrita com a
+  conversão antes da normalização.
+- **Critério da AMB-026 (P6).** O texto ditado era "limite 0,00 com
+  observação 'nao reembolsavel'". A observação é texto livre, e o motor não o
+  interpreta (AMB-015); o critério escrito é o limite 0,00, e a observação é
+  informativa, como a periodicidade (AMB-035).
+- **Contagem.** O bloco foi apresentado como dezessete decisões e tinha
+  dezoito pontos; a P5 decorre da P2 e virou consequência da AMB-023.
+
+Também por coerência com regras existentes, sem decisão nova: política e
+cotações inválidas são informadas junto com as demais causas de lote (o
+princípio de todas as causas detectáveis da RN-010); "política inválida"
+inclui a falta da tabela padrão e do limiar, sem os quais ela não pode ser
+aplicada; sem cotação não há valor em reais, e a faixa de valor não é
+avaliada; e o consolidado informa a tabela aplicada, para que o auditor saiba
+contra quais limites o lote foi julgado.
+
+**Convenção introduzida:** os aceites das RN-001 a RN-012, os das AMB-001 a
+AMB-021 e os casos da §7 que citam uma despesa do lote de exemplo com os
+limites 60,00, 80,00 e 250,00 avaliam essa despesa num lote sem centro de
+custo, isto é, sob a tabela padrão (§4.2). Sem a convenção, cada um desses
+aceites precisaria ser reescrito para o CC-ENG-PLATAFORMA e deixaria de
+verificar a regra que verifica. O lote completo é verificado na §9.
+
+**Classificação:** mudança de requisito, não esclarecimento. A política v3
+deixou de valer.
+
+**O que isso invalidou:**
+- O resultado da §9 da spec 1.3 (623,43; 4/4/5/1).
+- A decisão do plan §4, "constante e não arquivo de configuração", e o
+  `enum Categoria` com limites fixos de `src/reembolso/dominio/Politica.kt`.
+- A AMB-015 para o centro de custo, e com ela a premissa do plan §2 de que o
+  adaptador não lê o centro de custo.
+- Os aceites previstos na T-017 para a AMB-015 que dependem do centro de
+  custo: "lotes que diferem só no centro de custo → resultados idênticos"
+  passou a ser falso.
+- Os aceites previstos na T-020 (623,43) e a contagem de 20 casos da T-015.
+- O `OrdemCamposSecao41Test` passa a falhar desde o commit da spec 2.0, por
+  desenho: a tabela de despesa ganhou a moeda e `CampoDespesa` ainda não.
+
+**O que continua valendo:** RN-004 a RN-007 e RN-012 no texto; as AMB-001 a
+AMB-021, com os ajustes acima; os 112 testes das T-001 a T-013, que
+constroem lotes sem centro de custo e continuam corretos pela convenção.
+
+**Tasks afetadas:**
+- Concluídas que precisam de retrabalho: T-004 (modelo: `Politica.kt`,
+  `CampoDespesa`, `Falha`, `CausaLote`), T-006 (causas de moeda), T-008
+  (`limiteAplicavel` passa a depender da tabela), T-010 (elegibilidade pela
+  tabela), T-011 (limiar lido da política), T-013 (chave em reais, de graça
+  depois da conversão). O retrabalho está nas T-023 a T-027.
+- Pendentes com aceites alterados: T-014 (tabela aplicada no consolidado),
+  T-015 (26 casos), T-017 (centro de custo e moeda), T-018 (campos novos da
+  saída), T-019 (política e cotações na CLI), T-020 (três lotes da §9). Os
+  complementos estão nas T-028 a T-032.
+- T-016 não muda: o `RastreabilidadeTest` lê os IDs e a contagem da §7 da
+  própria spec e passa a exigir testes para RN-013, RN-014 e AMB-022 a
+  AMB-038.
+- Novas: T-021 a T-032.
+
+**Achado de processo:** os testes que leem a spec não rodaram de novo depois
+de uma mudança só na spec, porque o Gradle não declara `specs/` como entrada
+da tarefa de teste e os considerou atualizados. A falha só apareceu com
+`--rerun-tasks`. Vira a T-022.
+
+**Custo:** 3 arquivos de documentação (spec.md, DECISIONS.md, tasks.md),
+mais `docs/analise-envelope.md`. Nenhum código alterado nesta etapa.
+
+---
+
 ## D-011 — Conversão de caixa: mapeamento completo do Unicode, independente de localidade · `2026-10-19`
 
 **Gatilho:** a leitura da RN-008 antes da T-010. A spec dizia apenas que
