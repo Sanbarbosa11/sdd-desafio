@@ -214,7 +214,7 @@ Todos os testes desta fase constroem `LoteLido` direto, sem JSON (plan §6).
     `§8 despesa recusada não tem limite aplicado`
   - **Commit:** —
 
-- [ ] **T-013** — Etapa 1.4 da §8: duplicidade em duas passadas, só entre
+- [x] **T-013** — Etapa 1.4 da §8: duplicidade em duas passadas, só entre
   despesas sem motivo, com comparador de identificadores por code point
   (DT-007, R-07).
   - **Atende:** RN-009, RN-011, AMB-009, AMB-010, AMB-011, AMB-013 (fornecedor), AMB-014, AMB-017
