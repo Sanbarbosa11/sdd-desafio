@@ -32,7 +32,10 @@ sealed interface ResultadoDespesa {
     ) : ResultadoDespesa
 }
 
-data class Periodo(val inicio: LocalDate, val fim: LocalDate)
+data class Periodo(val inicio: LocalDate, val fim: LocalDate) {
+    // RN-005: as duas bordas pertencem ao período.
+    operator fun contains(data: LocalDate): Boolean = data in inicio..fim
+}
 
 data class Consolidado(
     val totalReembolsado: Valor,

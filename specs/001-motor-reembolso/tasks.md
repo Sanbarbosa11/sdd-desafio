@@ -152,7 +152,7 @@ Todos os testes desta fase constroem `LoteLido` direto, sem JSON (plan §6).
     `RN-011 alimentacao de 60,004 → reembolso 60,00 integral`
   - **Commit:** —
 
-- [ ] **T-009** — Etapa 1.1 da §8: pertinência ao período, bordas inclusivas,
+- [x] **T-009** — Etapa 1.1 da §8: pertinência ao período, bordas inclusivas,
   e recusa com `FORA_DA_COMPETENCIA` sem avaliação contra o limite.
   - **Atende:** RN-005, RN-006, AMB-008, AMB-010, AMB-016
   - **Aceite:** `RN005PeriodoTest` e `RN006ForaDoPeriodoTest` passam:

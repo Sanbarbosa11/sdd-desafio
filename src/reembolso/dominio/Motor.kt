@@ -18,20 +18,39 @@ object Motor {
         val despesas = validarItens(elementos).map { item ->
             when (item) {
                 is ItemValidado.Invalido -> item.erro
-                is ItemValidado.Valido -> avaliarDespesa(item.despesa)
+                is ItemValidado.Valido -> avaliarDespesa(item.despesa, periodo)
             }
         }
         return ResultadoLote.Avaliado(periodo, despesas, consolidar(despesas))
     }
 
-    private fun avaliarDespesa(despesa: Despesa): ResultadoDespesa {
-        // Etapa 1 (elegibilidade): período, categoria, nota fiscal e duplicidade entram nas T-009 a T-013.
+    private fun avaliarDespesa(despesa: Despesa, periodo: Periodo): ResultadoDespesa {
+        // Etapa 1 (elegibilidade): todas as regras são avaliadas, sem interrupção, na ordem da §8.
+        val motivos = mutableListOf<Motivo>()
+        // 1.1 Pertinência ao período (RN-005, RN-006).
+        if (despesa.data !in periodo) motivos += Motivo.FORA_DA_COMPETENCIA
+        // 1.2 a 1.4 entram nas T-010 a T-013.
         val categoria = Categoria.porCodigo(despesa.categoria)
             ?: TODO("T-010: categoria inelegível é recusada com CATEGORIA_INELEGIVEL (RN-008)")
+
+        // Com qualquer motivo, reembolso 0,00 e nenhuma avaliação contra o limite (§8, etapa 2).
+        if (motivos.isNotEmpty()) return recusar(despesa, motivos)
 
         // Etapa 2 (valor).
         return avaliarValor(despesa, categoria)
     }
+
+    private fun recusar(despesa: Despesa, motivos: List<Motivo>) = ResultadoDespesa.Recusada(
+        id = despesa.id,
+        valor = despesa.valor,
+        categoria = despesa.categoria,
+        notaExigida = notaExigida(despesa),
+        motivos = motivos,
+        mantida = null,
+    )
+
+    // RN-003: sobre o valor normalizado, antes de qualquer limite.
+    private fun notaExigida(despesa: Despesa) = despesa.valor > Politica.LIMIAR_NOTA_FISCAL
 
     // RN-001: cada despesa contra o limite da sua categoria, isoladamente. RN-002: o limite é teto.
     private fun avaliarValor(despesa: Despesa, categoria: Categoria): ResultadoDespesa.Aceita {
@@ -44,7 +63,7 @@ object Motor {
             limite = limite,
             reembolsado = if (parcial) limite else despesa.valor,
             excedente = if (parcial) despesa.valor - limite else null,
-            notaExigida = despesa.valor > Politica.LIMIAR_NOTA_FISCAL, // RN-003
+            notaExigida = notaExigida(despesa),
         )
     }
 
