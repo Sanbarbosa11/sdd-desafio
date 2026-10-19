@@ -3,14 +3,9 @@ package reembolso.regras
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import reembolso.dominio.Motivo
-import reembolso.dominio.ResultadoDespesa
 import reembolso.dominio.Valor
 
 class RN006ForaDoPeriodoTest {
-
-    // Recusada não tem campo de limite nem de reembolso: o tipo garante "sem limite aplicado" e 0,00.
-    private fun List<ResultadoDespesa>.recusada(id: String) =
-        filterIsInstance<ResultadoDespesa.Recusada>().single { it.id == id }
 
     @Test
     fun `RN-006 AMB-010 d-008 alimentacao 41,00 com NF → recusada com FORA_DA_COMPETENCIA sem limite aplicado`() {

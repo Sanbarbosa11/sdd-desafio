@@ -43,6 +43,10 @@ fun avaliar(vararg despesas: ElementoLido): List<ResultadoDespesa> = avaliado(lo
 fun List<ResultadoDespesa>.aceita(id: String): ResultadoDespesa.Aceita =
     filterIsInstance<ResultadoDespesa.Aceita>().single { it.id == id }
 
+// Recusada não tem campo de limite nem de reembolso: o tipo garante "sem limite aplicado" e 0,00.
+fun List<ResultadoDespesa>.recusada(id: String): ResultadoDespesa.Recusada =
+    filterIsInstance<ResultadoDespesa.Recusada>().single { it.id == id }
+
 fun valor(texto: String): Lido<BigDecimal> = Lido.Presente(BigDecimal(texto))
 
 fun despesa(id: String, data: String, categoria: String, fornecedor: String, valor: String, nf: Boolean) =

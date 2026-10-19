@@ -32,7 +32,9 @@ object Motor {
         // 1.2 Elegibilidade da categoria, já normalizada (RN-008).
         val categoria = Categoria.porCodigo(despesa.categoria)
         if (categoria == null) motivos += Motivo.CATEGORIA_INELEGIVEL
-        // 1.3 e 1.4 entram nas T-011 e T-013.
+        // 1.3 Exigência de nota fiscal (RN-003, RN-004).
+        if (notaExigida(despesa) && !despesa.temNotaFiscal) motivos += Motivo.SEM_NOTA_FISCAL
+        // 1.4 entra na T-013.
 
         // Com qualquer motivo, reembolso 0,00 e nenhuma avaliação contra o limite (§8, etapa 2).
         if (motivos.isNotEmpty() || categoria == null) return recusar(despesa, motivos)
@@ -50,7 +52,8 @@ object Motor {
         mantida = null,
     )
 
-    // RN-003: sobre o valor normalizado, antes de qualquer limite.
+    // RN-003: sobre o valor normalizado, antes de qualquer limite. Único ponto que lê o limiar:
+    // alimenta o campo notaExigida da saída e a recusa SEM_NOTA_FISCAL da etapa 1.3.
     private fun notaExigida(despesa: Despesa) = despesa.valor > Politica.LIMIAR_NOTA_FISCAL
 
     // RN-001: cada despesa contra o limite da sua categoria, isoladamente. RN-002: o limite é teto.

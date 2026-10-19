@@ -182,7 +182,7 @@ Todos os testes desta fase constroem `LoteLido` direto, sem JSON (plan §6).
     `RN-008 AMB-013 ALİMENTACAO com U+0130 → recusada com CATEGORIA_INELEGIVEL`
   - **Commit:** —
 
-- [ ] **T-011** — Etapa 1.3 da §8: exigência de nota fiscal sobre o valor
+- [x] **T-011** — Etapa 1.3 da §8: exigência de nota fiscal sobre o valor
   normalizado (`Politica.LIMIAR_NOTA_FISCAL`) e recusa com `SEM_NOTA_FISCAL`.
   - **Atende:** RN-003, RN-004, RN-011, AMB-004, AMB-005, AMB-006, AMB-014
   - **Aceite:** `RN003NotaFiscalTest` e `RN004SemNotaFiscalTest` passam:
