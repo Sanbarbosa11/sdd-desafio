@@ -200,7 +200,7 @@ Todos os testes desta fase constroem `LoteLido` direto, sem JSON (plan §6).
     `RN-004 d-003 e transporte 100,01 com NF → regra não se aplica, reembolso 80,00 parcial`
   - **Commit:** —
 
-- [ ] **T-012** — Lista de motivos: todas as regras de elegibilidade avaliadas
+- [x] **T-012** — Lista de motivos: todas as regras de elegibilidade avaliadas
   sem interrupção, lista ordenada por `Motivo.ordinal`, recusa sem limite,
   erro com lista vazia.
   - **Atende:** RN-007, AMB-017, AMB-018; §8 (recusada não é avaliada contra o limite)

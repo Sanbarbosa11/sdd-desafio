@@ -48,7 +48,12 @@ object Motor {
         valor = despesa.valor,
         categoria = despesa.categoria,
         notaExigida = notaExigida(despesa),
-        motivos = motivos,
+        // RN-007: ordem da §8, que é a ordem de declaração de Motivo (DT-006, OrdemMotivosSecao8Test).
+        // A ordenação por Motivo.ordinal torna a ordem da saída independente
+        // da ordem de coleta. Os testes de ordem da T-010 e da T-011 passam a
+        // verificar a saída, não a coleta. A ordem da §8 continua amarrada pelo
+        // OrdemMotivosSecao8Test, que lê a spec.
+        motivos = motivos.sortedBy { it.ordinal },
         mantida = null,
     )
 
