@@ -55,7 +55,7 @@
     `RN-011 AMB-014 54,90 e 54,900 são o mesmo valor`
   - **Commit:** —
 
-- [ ] **T-003** — Função `aparar()` no domínio com o conjunto explícito dos 25
+- [x] **T-003** — Função `aparar()` no domínio com o conjunto explícito dos 25
   code points da propriedade Unicode `White_Space` (DT-005).
   - **Atende:** §4.1 (espaços nas extremidades); base de RN-008, RN-010, RN-012
   - **Aceite:** `EspacosUnicodeTest` passa:
