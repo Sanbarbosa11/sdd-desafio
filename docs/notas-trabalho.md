@@ -23,6 +23,15 @@ verificáveis" das quatro ambiguidades, mas um dos ajustes estava no "Custo
 aceito" da AMB-006. Ele apontou a imprecisão e sugeriu "os registros das
 AMB-001, 002, 004 e 006". Aceitei. Erro meu, pego por ele.
 
+19/10 — T-012: a ordenação da lista de motivos por `Motivo.ordinal`, pedida
+pela task e pela DT-006, enfraqueceu a cobertura dos testes de ordem da T-010
+e da T-011: uma coleta fora da ordem da §8 deixa de quebrá-los, porque a
+ordenação corrige a saída. O agente avisou antes de eu perguntar. Decisão:
+manter a ordenação, porque é a §8 que governa a saída. Os testes de ordem
+passam a verificar a saída, não a coleta, e a ordem da §8 continua amarrada
+pelo OrdemMotivosSecao8Test, que lê a spec. Registrei a observação também em
+comentário no ponto onde a lista é ordenada.
+
 ## Delegação
 18/10 — AMB-002: o agente apontou por conta própria duas inconsistências
 que eu não tinha visto (o "Depende de" da RN-001 ficaria falso depois da
@@ -113,6 +122,15 @@ define quatro. Ele apontou a divergência e perguntou se eu queria ajustar a
 task ou manter os quatro, em vez de simplesmente seguir meu pedido. Mantive
 os quatro — alterar o documento para caber numa imprecisão minha inverteria
 a relação. Erro meu, pego por ele.
+
+19/10 — Correções pós-revisão: na correção do achado A5 eu ditei "não
+participa de nenhuma regra de elegibilidade nem de valor". Estava errado e
+contradizia a RN-007: uma despesa fora do período e sem nota fiscal recebe
+os dois motivos, logo passa pela regra de nota. Ele recusou a redação,
+explicou a contradição com o caso da §7 e propôs uma frase que restringe
+apenas às regras de valor e à duplicidade. Se tivesse aceitado, o erro
+entraria no código da T-005 e produziria um motivo a menos na saída.
+Terceiro erro meu pego por ele.
 
 ## Li o diff?
 18/10 — AMB-004: li o diff, mas aceitei sem verificar uma afirmação factual
