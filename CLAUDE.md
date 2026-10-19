@@ -32,7 +32,10 @@ Se o que eu pedi não está coberto por nenhuma task, me avise em vez de impleme
 - Linguagem: Kotlin 2.0.21, bytecode e API do Java 17 (DT-001). Gradle 8.11.1
   via wrapper; exige `JAVA_HOME` com JDK 17+ (nesta máquina, o JDK 21 do
   Android Studio).
-- Rodar: `./gradlew run --args="calcular --input exemplos/despesas-exemplo.json --output saida.json"`
+- Rodar: **ainda não implementado** — a CLI vem na T-019 (e recebe política e
+  câmbio na T-030). Contrato previsto:
+  `./gradlew run --args="calcular --input exemplos/despesas-exemplo.json --output saida.json"`.
+  Hoje `main` está vazio e o `run` não faz nada.
 - Testes: `./gradlew test` (um só: `./gradlew test --tests 'reembolso.regras.RN002*'`)
 - Lint/format: nenhum; `./gradlew build` é o check.
 
