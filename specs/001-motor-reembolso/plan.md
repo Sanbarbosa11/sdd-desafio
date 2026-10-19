@@ -1,6 +1,6 @@
 # Plano Técnico — Motor de Cálculo de Reembolso
 
-**Versão:** 1.0 · **Baseado na spec:** 1.1
+**Versão:** 1.1 · **Baseado na spec:** 1.1
 
 > Aqui mora o COMO. Este arquivo pode e deve falar de linguagem, biblioteca e
 > arquitetura. O que ele **não** pode é introduzir regra de negócio nova — se
@@ -410,9 +410,19 @@ tamanho.
 - **Testes de rastreabilidade** (`tests/reembolso/rastreabilidade/`). Leem
   `spec.md` e falham o build quando código e spec divergem:
   - `RastreabilidadeTest`: extrai todo `### RN-\d{3}` da spec e exige pelo
-    menos um teste cujo nome contenha o ID. Conta as linhas da tabela da §7 e
-    exige o mesmo número de testes com prefixo `§7`. Uma RN nova sem teste,
-    ou um caso de borda novo sem teste, quebra o build.
+    menos um teste cujo nome contenha o ID. Faz o mesmo com todo
+    `### AMB-\d{3}`: cada ambiguidade é requisito tanto quanto uma regra, e
+    exige pelo menos um teste cujo nome contenha o seu ID. Ficam isentas
+    apenas as ambiguidades dissolvidas, que não têm decisão operacional
+    própria; o teste as declara numa lista explícita (`AMB-003`, `AMB-012`),
+    de modo que uma AMB nova nunca entre na isenção por descuido, e falha se
+    um ID da lista não existir na spec ou se o título correspondente não
+    contiver "(dissolvida)". Conta as linhas da tabela da §7 e exige o mesmo
+    número de testes com prefixo `§7`. Uma RN ou AMB nova sem teste, ou um
+    caso de borda novo sem teste, quebra o build.
+  - Consequência para a nomenclatura: o teste que verifica a consequência
+    de uma AMB leva o seu ID no nome, depois do ID da RN quando houver
+    (`RN-001 AMB-001 três alimentações de 59,00 …`).
   - `OrdemMotivosSecao8Test`: extrai, na ordem, os códigos de motivo da lista
     de elegibilidade da §8 (`→ FORA_DA_COMPETENCIA`, …) e compara com
     `Motivo.entries.map { it.name }`. Uma reordenação acidental do enum, ou da
