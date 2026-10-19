@@ -45,7 +45,7 @@
     `AmbienteTest` › `build compila src e executa testes de tests`
   - **Commit:** —
 
-- [ ] **T-002** — `value class Valor` com `normalizar` (`setScale(2, HALF_UP)`)
+- [x] **T-002** — `value class Valor` com `normalizar` (`setScale(2, HALF_UP)`)
   como único construtor, e os testes de guarda da aritmética (DT-003).
   - **Atende:** RN-011, AMB-014
   - **Aceite:** `RN011NormalizacaoMonetariaTest` passa:
