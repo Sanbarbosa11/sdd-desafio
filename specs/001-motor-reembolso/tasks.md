@@ -80,7 +80,7 @@
 
 Todos os testes desta fase constroem `LoteLido` direto, sem JSON (plan §6).
 
-- [ ] **T-005** — Validação de lote: período ausente ou de tipo incompatível,
+- [x] **T-005** — Validação de lote: período ausente ou de tipo incompatível,
   início ou fim ausente ou inválido, início posterior ao fim, despesas não
   informadas ou de tipo incompatível, identificador repetido após `aparar()`.
   Todas as causas detectáveis são reportadas.
