@@ -95,6 +95,12 @@ que nenhum de nós tinha visto: se formam duplicata, qual é mantida? A
 RN-009 dizia "ordem lexicográfica" sem definir a ordenação dos caracteres
 entre si. Erro meu, pego por ele, com ganho líquido.
 
+19/10 — T-002: pedi três testes citando a RN-011 de memória, mas a task
+define quatro. Ele apontou a divergência e perguntou se eu queria ajustar a
+task ou manter os quatro, em vez de simplesmente seguir meu pedido. Mantive
+os quatro — alterar o documento para caber numa imprecisão minha inverteria
+a relação. Erro meu, pego por ele.
+
 ## Li o diff?
 18/10 — AMB-004: li o diff, mas aceitei sem verificar uma afirmação factual
 sobre o conteúdo do despesas-exemplo.json. Custou um raciocínio errado que
