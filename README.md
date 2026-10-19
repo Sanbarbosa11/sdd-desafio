@@ -21,31 +21,21 @@ originou o projeto estão em [`docs/README-desafio.md`](docs/README-desafio.md).
   - a etapa de valor: limite e reembolso parcial (RN-001, RN-002);
   - normalização monetária (RN-011).
 
-  São as T-001 a T-013, com **112 testes**.
+  São as T-001 a T-013, mais a T-023 (o campo moeda na ordem da §4.1 da
+  spec 2.0), com **112 testes**.
 - **Em aberto:**
   - T-014 a T-020: consolidado completo, casos de borda da §7,
     `RastreabilidadeTest`, entrada e saída JSON, CLI e ponta a ponta;
-  - T-021 a T-032: a política v4 do Dia 2 (limites por centro de custo e
-    moeda estrangeira).
+  - T-021, T-022 e T-024 a T-032: o restante da política v4 do Dia 2
+    (limites por centro de custo e conversão de moeda estrangeira).
 - **A spec está à frente do código.** A spec 2.0 já absorveu a política v4
   (D-012); o código ainda implementa a política v3.
 - **Ainda não há CLI.** `calcular --input X --output Y` é a T-019. O
   `./gradlew run` existe, mas `main` está vazio e não faz nada.
 
-## O build está vermelho, e isso é esperado
+## Estado do build
 
-Num clone limpo, `./gradlew build` executa 112 testes e falha em **um**:
-
-```
-OrdemCamposSecao41Test > §4-1 AMB-021 ordem de CampoDespesa é a ordem da tabela de despesa da spec() FAILED
-112 tests completed, 1 failed
-```
-
-**A falha é intencional.** Esse teste lê a tabela de despesa da §4.1 da spec
-e exige que a ordem dos campos no código seja a mesma. A spec 2.0 acrescentou
-o campo **moeda** à §4.1, e o código só ganha esse campo na **T-023**. O teste
-existe para isso: uma informação nova na spec quebra o build até ganhar lugar
-no código. Os outros 111 testes passam.
+`./gradlew build` passa: **112 testes, nenhuma falha**.
 
 Cuidado com um build verde depois de mudar **só** a spec: o Gradle ainda não
 declara `specs/` como entrada da tarefa de teste e pode considerar os testes

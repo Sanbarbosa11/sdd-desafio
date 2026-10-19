@@ -208,7 +208,7 @@ Os três estão em aberto em `specs/001-motor-reembolso/tasks.md`. Hoje, a únic
 - **`Valor` e a RN-011.** A conversão de moeda é uma multiplicação seguida de `normalizar`.
 - **O que ainda não existe não precisa ser desfeito.** Entrada, saída e CLI (T-017 a T-019) ainda não foram implementadas.
 
-**Resistiu:** previsão da análise. As T-023 a T-030 é que vão medir isso no código.
+**Resistiu:** previsão da análise. As T-024 a T-030 é que vão medir isso no código.
 1. **`Politica.kt`.** A enum `Categoria`, com três valores e limites fixos, não representa categorias por centro de custo vindas de arquivo: `representacao` no CC-COMERCIAL, hospedagem 0,00 no CC-ENG-PLATAFORMA. Isso contradiz o plan §4 ("constante, não arquivo de configuração") e a linha do `CLAUDE.md` sobre a política.
 2. **A CLI.** Ela é fixa pelo DESAFIO (`calcular --input --output`) e não diz de onde vêm `politica-v4.json` e `cambio.json`.
 3. **A AMB-015 "por construção".** O adaptador não lê o centro de custo, e os testes previstos da T-017 para a AMB-015 se invertem.
@@ -257,10 +257,10 @@ O que não foi de graça foi o `Politica.kt`. O enum `Categoria`, com três valo
 **O que ficou de fora, e por quê:**
 - **Não implementadas:**
   - T-014 a T-020: consolidado, bordas da §7, `RastreabilidadeTest`, entrada JSON, saída JSON, CLI e ponta a ponta;
-  - T-021 a T-032: o envelope no código.
-- **Onde parou:** a spec 2.0 absorveu o envelope por inteiro (`a04c1d3`, `c89de59`, `46996d2`). O código parou com a etapa 1 da §8 completa, em `8d6c8b6`, com 112 testes.
+  - T-021, T-022 e T-024 a T-032: o envelope no código. Do envelope, só a T-023 entrou: o campo moeda na ordem da §4.1 (`a056bc8`).
+- **Onde parou:** a spec 2.0 absorveu o envelope por inteiro (`a04c1d3`, `c89de59`, `46996d2`). O código parou com a etapa 1 da §8 completa (`8d6c8b6`) e o campo moeda (`a056bc8`), com 112 testes, todos passando.
 - **Por quê:** priorizei a absorção pela spec, que é o que o envelope avalia, em vez de código que não caberia no tempo.
-- **O custo:** não há CLI executável. O `OrdemCamposSecao41Test` falha desde `a04c1d3`, por desenho, até a T-023 (D-012).
+- **O custo:** não há CLI executável. O `OrdemCamposSecao41Test` falhou por desenho de `a04c1d3` até a T-023 (`a056bc8`), e o build voltou a ficar verde.
 
 **Para qual tamanho de projeto isto valeu a pena?**
 
