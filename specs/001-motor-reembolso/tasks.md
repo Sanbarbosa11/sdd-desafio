@@ -1,6 +1,6 @@
 # Tasks — Motor de Cálculo de Reembolso
 
-**Baseado em:** spec 1.2 · plan 1.1
+**Baseado em:** spec 1.3 · plan 1.1
 
 > Cada task é pequena o bastante para virar **um commit**. Se você não consegue
 > descrever o critério de aceite como "o teste X passa", a task está grande demais.
@@ -176,7 +176,10 @@ Todos os testes desta fase constroem `LoteLido` direto, sem JSON (plan §6).
     `RN-008 AMB-013 Alimentacao, ALIMENTACAO e alimentacao com espaços → a mesma categoria`,
     `RN-008 AMB-013 alimentação com cedilha e til → recusada com CATEGORIA_INELEGIVEL`,
     `RN-008 AMB-013 transporte-urbano → recusada com CATEGORIA_INELEGIVEL`,
-    `RN-008 AMB-013 Bistro Central, BISTRO CENTRAL e Bistro Central com espaços → o mesmo fornecedor e Bistrô Central é distinto`
+    `RN-008 AMB-013 Bistro Central, BISTRO CENTRAL e Bistro Central com espaços → o mesmo fornecedor e Bistrô Central é distinto`,
+    `RN-008 AMB-013 ALIMENTACAO em localidade turca ou azerbaijana → alimentacao`,
+    `RN-008 AMB-013 fornecedores ΟΔΟΣ e Οδος → a mesma chave οδος`,
+    `RN-008 AMB-013 ALİMENTACAO com U+0130 → recusada com CATEGORIA_INELEGIVEL`
   - **Commit:** —
 
 - [ ] **T-011** — Etapa 1.3 da §8: exigência de nota fiscal sobre o valor
@@ -228,7 +231,8 @@ Todos os testes desta fase constroem `LoteLido` direto, sem JSON (plan §6).
     `RN-009 AMB-011 d-006 e D-006 → mantém D-006`,
     `RN-009 identificador fora do BMP é comparado por code point`,
     `RN-011 AMB-014 54,90 e 54,904 → grupo de duplicatas`,
-    `RN-009 AMB-017 despesa com erro de item não integra grupo`
+    `RN-009 AMB-017 despesa com erro de item não integra grupo`,
+    `RN-009 AMB-013 fornecedores ΟΔΟΣ e Οδος → grupo de duplicatas`
   - **Commit:** —
 
 - [ ] **T-014** — Consolidado do lote: período avaliado, total reembolsado,

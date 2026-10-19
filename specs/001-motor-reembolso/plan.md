@@ -1,6 +1,6 @@
 # Plano Técnico — Motor de Cálculo de Reembolso
 
-**Versão:** 1.1 · **Baseado na spec:** 1.2
+**Versão:** 1.1 · **Baseado na spec:** 1.3
 
 > Aqui mora o COMO. Este arquivo pode e deve falar de linguagem, biblioteca e
 > arquitetura. O que ele **não** pode é introduzir regra de negócio nova — se
@@ -324,7 +324,9 @@ expressamente.
 que a biblioteca padrão diverge: U+001C a U+001F **não** são aparados, e
 U+0085 **é**. A conversão para minúsculas usa
 `lowercase()` do Kotlin, que é independente de localidade (`Locale.ROOT`) e
-não sofre o problema do "i" turco.
+não sofre o problema do "i" turco. É o mapeamento completo de caixa do
+padrão Unicode, que a RN-008 fixa (spec 1.3, D-011); esta DT implementa a
+regra, não a decide.
 
 ### DT-006 — A ordem da §8 vive em dois lugares
 
