@@ -159,7 +159,7 @@ Versão intermediária (`9448765`, D-007): "… em ordem lexicográfica, caracte
 - **Fase de implementação (18–19/10).** Rodei os testes a cada task: 112 testes, todos passando, ao final da T-013 (sessão de implementação, `8d6c8b6`; `build/test-results/test/`, 19 arquivos, 0 falhas). A partir da T-004 (`b6734a8`), o agente passou a verificar que os testes falham quando devem: fazia alterações deliberadas no código (inverter enum, trocar ordem, import proibido, bordas exclusivas, comparador errado), conferia quantos testes quebravam e restaurava o código. Fez isso da T-004 à T-013. Não há registro disso no repositório além da sessão de implementação. Aprovei explicitamente as fronteiras provisórias da T-008 (`5af7f0b`): TODO de categoria inelegível, fechado na T-010 (`97504e0`); `notaExigida` calculado antes da T-011; consolidado antes da T-014.
 - **Paradas por bug de spec.** Quando a implementação revelou uma lacuna, parei, decidi, registrei na spec e só então segui. Aconteceu no plan, com as seis lacunas da D-009 (`4940b8c`, antes de `ac2c7a6`), e antes da T-010 (D-011, `d7b07b6`, antes de `5af7f0b`). Nessa segunda vez, o agente verificou no JDK que, na localidade turca, "ALIMENTACAO" vira "alımentacao" e d-014 seria recusada.
 
-**Li o diff inteiro em que porcentagem das entregas?** [NÚMERO]%. O que a evidência permite dizer:
+**Li o diff inteiro em que porcentagem das entregas?** 60%. Nas tasks de spec e de decisão li tudo, linha a linha, porque era o artefato que eu estava construindo. Nas tasks de código, da T-005 à T-013, li o diff de `src/` e os nomes dos testes, mas não os corpos dos testes. A T-008 à T-013 entraram em 18 minutos com cerca de 950 linhas: não dá para ler 950 linhas em 18 minutos, e eu não li. O que me deixou confortável em aceitar foi o agente mostrar, em cada task, que os testes falhavam quando o código era alterado de propósito. Isso é uma prova indireta, não é ter lido. O que a evidência permite dizer:
 - Na fase de spec, tenho nota de ter lido o diff inteiro na AMB-001, AMB-002 e AMB-004 (`docs/notas-trabalho.md`). Para as demais AMB não anotei.
 - Na implementação, não tenho nota de leitura de diff de nenhuma task. Os timestamps mostram T-008 a T-013 commitadas entre 00:24 e 00:42 de 19/10, cerca de 950 linhas inseridas em 18 minutos (`git show --shortstat` de `5af7f0b` a `8d6c8b6`). T-012 e T-013 caíram no mesmo minuto. Esses números não sustentam a afirmação de que li cada linha, e eu não a faço. Em T-005 a T-013 li o diff de `src/` e os nomes dos testes; não li todos os corpos de teste linha a linha.
 
@@ -230,14 +230,25 @@ Os três estão em aberto em `specs/001-motor-reembolso/tasks.md`. Hoje, a únic
 - Teria tratado "informação não prevista é ignorada" (RN-010, D-007) e "centro de custo sem efeito" (AMB-015, §4.1) como decisões de risco, com custo aceito explícito, e não como simplificação.
 - Teria declarado na §4 a moeda do valor, mesmo que só BRL fosse aceito.
 
-[FALTA: o que mais eu mudaria, depois de absorver]
+Depois de absorver, mudaria também a saída (§4.2) e a interface da CLI:
+- **A saída.** A spec 2.0 passou a exigir que a saída mostre a moeda e o valor originais e a taxa usada, para o auditor conseguir refazer a conta.
+- **A CLI.** O motor agora precisa de dois arquivos que não recebia antes, a política e o câmbio, mas o `DESAFIO.md` fixa a interface em `--input` e `--output`. Essa tensão está declarada e não resolvida, na T-021 e na análise do envelope (`docs/analise-envelope.md`, "Resiste"). Não decidi se os arquivos entram como flags novas, caminho convencional ou variável de ambiente. Deixei registrado em vez de decidir às pressas, porque essa decisão muda o contrato com quem chama o motor.
 
 **O que a spec me poupou, em concreto:**
 - **Uma análise de impacto endereçável.** A análise do envelope pôde dizer, regra por regra, o que cai: RN-001, 002, 003, 008, 009, 010 e 011; AMB-013, 015, 007, 001, 006, 014 e 009. E também o que continua válido: o texto das RN-004, 005, 006, 007 e 012. Não precisei reler o código para saber.
 - **Um impacto calculável.** A §7 e a §9 tinham os resultados esperados do lote do Dia 1 item a item, o que permitiu calcular o novo total (386,93 contra 623,43) antes de escrever uma linha.
 - **Ambiguidades novas reconhecíveis pelo mesmo critério.** As decisões anteriores já tinham critério escrito: abrangência do dano (AMB-020), alcance estreito da normalização (AMB-013), campo sem regra (AMB-015). Por isso as ambiguidades novas, como P3 (centro de custo ausente: padrão ou erro de lote) e T8 (moeda nula ou minúscula), podem ser decididas por esses critérios, e não do zero.
 
-[FALTA: tempo ou retrabalho economizado, medido depois da absorção]
+**O que isso economizou, medido:** 33 minutos para absorver o envelope inteiro na spec, sem tocar em uma linha de código: 4 arquivos de documentação, +1.335/−173 linhas, entre 00:48 e 01:21.
+
+O que fez ser rápido estava desenhado desde o plan:
+- o limite era resolvido num ponto único (`limiteAplicavel`);
+- o domínio não lê arquivos;
+- a categoria já era `String`, e não enum, no modelo de resultado, por causa do "coworking".
+
+A ordem da §8, a coleta de motivos e a duplicidade em duas passadas não precisaram mudar.
+
+O que não foi de graça foi o `Politica.kt`. O enum `Categoria`, com três valores e limites fixos, não representa um conjunto de categorias que varia por centro de custo e vem de um arquivo que muda sem aviso. E essa foi uma decisão minha, registrada no plan §4: recusei arquivo de configuração para não deixar o limite mudar sem o teste nem a spec mudarem. O envelope inverteu exatamente isso. A decisão estava certa para o que eu sabia e errada para o que veio depois, e eu só descobri porque o desafio tinha um Dia 2.
 
 ---
 
@@ -253,8 +264,21 @@ Os três estão em aberto em `specs/001-motor-reembolso/tasks.md`. Hoje, a únic
 
 **Para qual tamanho de projeto isto valeu a pena?**
 
+Valeu pela densidade da regra, não pelo tamanho do código. São 112 testes para umas 400 linhas de domínio (`src/reembolso/dominio/`: 471 linhas, 348 sem comentários e linhas em branco). Isso parece desproporcional até você lembrar que cada linha dessas decide quanto uma pessoa recebe de volta. Onde o erro custa dinheiro de alguém e a regra chega escrita em português ambíguo, escrever a spec primeiro paga. Eu diria que vale a partir do momento em que existe mais de uma leitura defensável do requisito, e aqui eram 21 só no Dia 1.
+
 **Para qual não valeria?**
+
+Para um CRUD, ou qualquer coisa onde a regra é óbvia e o custo do erro é baixo. O nível de rigor da §4.1, com 25 code points de espaço em branco e conversão de caixa pelo mapeamento Unicode, é desperdício se o pior que acontece é um campo com espaço sobrando. O teste disso é simples: se eu não consigo escrever duas leituras defensáveis do requisito, não há ambiguidade para decidir, e a spec vira cerimônia.
 
 **O que eu faria diferente:**
 
+Duas coisas, as duas de processo.
+
+- **A revisão independente mais cedo.** A revisão por subagente veio depois da T-004 e achou quatro problemas que mudavam resultado (D-010, `2af517f`). Se ela tivesse vindo antes da primeira task de código, eu não teria revisado tasks já escritas. Foi a melhor hora que gastei no desafio, e eu a gastei tarde.
+- **`specs/` como entrada dos testes desde o primeiro dia.** Teria declarado `specs/` como entrada da tarefa de teste logo no início. O buraco existia desde a T-004: os testes que leem a spec não rodavam de novo quando só a spec mudava, e o build dizia verde. Eu construí uma proteção e não verifiquei se ela estava ligada. Só apareceu na absorção do envelope, por acidente (T-022, D-012).
+
 **A coisa mais desconfortável que aprendi sobre como eu trabalho com IA:**
+
+Descobrir que a minha revisão era mais frágil do que eu achava. O agente afirmou que nenhuma despesa do exemplo cruzava os R$ 100 antes do corte e ficava abaixo depois, e eu usei a afirmação no meu raciocínio sobre a AMB-006. Era falsa: a d-004 é exatamente esse caso, 100,01 de valor original e 80,00 de reembolsável. Ele se corrigiu sozinho na rodada seguinte, antes de a AMB-006 ser decidida (Discernimento, Caso 1). Eu não cruzei com os números do JSON, que estavam abertos na minha frente.
+
+E não foi um episódio isolado. Em seis momentos ele recusou ou corrigiu uma redação minha que estava errada: AMB-015, RN-012, o A5, o caso grego da D-011, a T-002 e a redação da D-001 (Discernimento, "Padrão que eu notei"). É bom que ele tenha recusado. O desconfortável é que, nas seis, quem tinha o contexto completo era eu.
