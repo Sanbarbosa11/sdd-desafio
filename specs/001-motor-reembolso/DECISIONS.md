@@ -10,6 +10,90 @@ Ordem cronológica inversa: a mais recente primeiro.
 
 ---
 
+## D-009 — Lacunas de validação descobertas ao projetar a implementação; AMB-020 e AMB-021 · `2026-10-18`
+
+**Gatilho:** a redação do plan.md. Ao desenhar o modelo de dados e o
+adaptador de entrada, seis situações apareceram para as quais a spec 1.0,
+já declarada completa, não determinava o resultado. Nenhuma foi encontrada
+ao escrever a spec: todas surgiram ao tentar representar o contrato da §4
+em estruturas concretas, quando cada campo exigiu uma resposta para
+"ausente", "de outro tipo" e "presente". O plan.md não introduziu regra
+nenhuma; as decisões foram trazidas para a spec antes de o plan ser escrito.
+
+**O que mudou na spec (versão 1.0 → 1.1):**
+- §6: novas AMB-020 (abrangência de um defeito de estrutura: lote ou
+  despesa — identificador ausente ou de tipo incompatível, período ou
+  relação de despesas de tipo incompatível, elemento da relação que não é
+  despesa) e AMB-021 (causas múltiplas de erro de item). §1: de "dezenove"
+  para "vinte e uma" ambiguidades.
+- §4.1: novo parágrafo "Espaços nas extremidades", com a definição única —
+  todo caractere de espaço em branco do padrão Unicode, incluindo tabulação e
+  espaços não separáveis —, referenciada pela RN-008, pela RN-010 e pela
+  RN-012. Lote inválido: acrescentados período e relação de despesas com tipo
+  incompatível. Despesa inválida: acrescentados identificador ausente e
+  elemento que não é despesa; "uma informação tem tipo incompatível" passa a
+  "uma informação obrigatória tem tipo incompatível"; todas as causas são
+  reportadas. Acrescentado que informação não obrigatória com tipo
+  incompatível é tratada como ausente. Tabela: identificador comparado e
+  apresentado após a remoção de espaços.
+- §4.2: identificador apresentado normalizado e, em erro sem identificador,
+  substituído pela posição na relação, contada a partir de um; de "Causa do
+  erro" para "Causas do erro", todas, na ordem da §4.1. Exemplo de d-009: de
+  "causa" para "causas".
+- RN-008: remissão ao alcance de "espaços" declarado na §4.1.
+- RN-010: as mesmas inclusões da §4.1 nos itens 1 e 2; tipo incompatível só
+  produz erro em informação obrigatória. Origem: acrescentadas AMB-015,
+  AMB-020 e AMB-021. Aceite: dez casos acrescentados.
+- RN-011: "para cima" declarado como "afastando-se do zero", com o mesmo
+  critério para valores negativos. Aceite: −45,005 → −45,01, erro de item.
+- RN-012: identificador apresentado na forma comparada; despesa sem
+  identificador ou com identificador de tipo incompatível não constitui
+  repetição. Origem: acrescentada a AMB-020. Aceite: três casos
+  acrescentados.
+- AMB-015, Decisão: o critério passa a alcançar o tipo do dado — campo sem
+  regra com tipo incompatível é tratado como ausente; o fornecedor, por ser
+  chave da RN-009, permanece obrigatório, e o seu tipo incompatível é erro de
+  item. Consequências: dois casos acrescentados. Regra afetada: de "nenhuma
+  RN" para "RN-010".
+- §9: critérios de validação atualizados; novo critério sobre espaços e
+  identificador normalizado.
+- RN-010, item 1, e §4.1, Lote inválido: entrada sintaticamente válida cuja
+  estrutura não é a de um lote passa a ser entrada que não pode ser lida —
+  causa única de rejeição, sem período ausente nem despesas não informadas.
+  Aceite acrescentado. Esclarecimento, pelo critério de abrangência da
+  AMB-020: sem estrutura de lote não há onde procurar período nem despesas.
+
+**Classificação:** AMB nova quando a decisão exige justificativa própria,
+por não estar coberta por decisão existente; esclarecimento quando a regra
+existente já alcança o caso e faltava declarar o alcance de um termo.
+- AMB-020 reúne identificador ausente e tipo incompatível na estrutura,
+  resolvidos pelo mesmo critério (abrangência do dano).
+- AMB-021 é própria porque a AMB-018 trata de motivos de recusa, e erro não
+  é recusa (RN-007).
+- Esclarecimentos: o arredondamento de negativos (RN-011 já declarava um
+  único critério), o alcance de "espaços" (termo já usado em três regras) e
+  o tipo incompatível em campo opcional (critério já estabelecido pela
+  AMB-015 para a ausência).
+
+**Por quê:** cada uma das seis situações admitia leituras com resultados
+verificáveis diferentes — lote rejeitado ou despesa em erro, uma causa ou
+várias, −45,01 ou −45,00 na saída, fornecedor de tabulação aceito ou em
+erro, descrição numérica aceita ou em erro. Decidi-las no código seria
+introduzir regra de negócio fora da spec.
+
+**O que isso invalidou:** nenhum critério de aceite. O resultado do lote de
+exemplo é o mesmo. Muda a representação da causa de erro, de uma para uma
+lista: d-009 passa a ter "causas: valor não positivo".
+
+**Tasks afetadas:** nenhuma — tasks.md ainda não foi escrito.
+
+**Custo:** 2 arquivos (spec.md, DECISIONS.md). Achado de projeto, não de
+especificação: a spec foi declarada completa na D-008, e esta entrada é a
+evidência de que o contrato só se mostrou incompleto quando foi
+representado.
+
+---
+
 ## D-008 — Fechamento: §1, §2 e §9 escritas; vazamentos e andaime do template removidos · `2026-10-18`
 
 **Gatilho:** o fechamento da spec — redação das seções que permaneciam no

@@ -102,7 +102,15 @@ só não virou decisão errada porque ele corrigiu. Lição: conferir afirmaçã
 sobre dado contra o dado, não contra a memória.
 
 ## Paradas por bug de spec
-<!-- data | regra que eu ia explicar no chat | AMB/RN criada | commit -->
+18/10 — plan.md: ao projetar o modelo de dados, o agente encontrou cinco
+pontos que a spec não decidia (identificador ausente, múltiplas causas de
+erro, arredondamento de negativos, tipo incompatível em despesas/periodo,
+alcance de "espaços"). Nenhum deles era visível ao escrever a spec — só
+apareceram quando alguém tentou implementar. Parei o plan, decidi os cinco,
+registrei na spec e no DECISIONS (D-009), e só então segui. É a Regra 2
+funcionando no sentido que eu não esperava: não foi o chat que vazou regra,
+foi a implementação que revelou lacuna.
+
 
 ## Perguntas que eu faria ao RH
 <!-- pergunta | decisão que tomei sem resposta -->
