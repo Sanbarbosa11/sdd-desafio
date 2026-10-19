@@ -8,5 +8,8 @@ import java.math.RoundingMode
 value class Valor private constructor(val decimal: BigDecimal) {
     companion object {
         fun normalizar(bruto: BigDecimal): Valor = Valor(bruto.setScale(2, RoundingMode.HALF_UP))
+
+        // Para as constantes da política; passa por normalizar como todo outro valor.
+        fun de(texto: String): Valor = normalizar(BigDecimal(texto))
     }
 }

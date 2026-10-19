@@ -64,7 +64,7 @@
     `§4-1 aparar não remove espaços do meio do texto`
   - **Commit:** —
 
-- [ ] **T-004** — Modelo do domínio (plan §3.1, §3.2, §4): `Lido`, `LoteLido`,
+- [x] **T-004** — Modelo do domínio (plan §3.1, §3.2, §4): `Lido`, `LoteLido`,
   `Categoria` e `Politica` em `Politica.kt`, `Motivo`, `CampoDespesa`, `Falha`,
   `CausaErro`, `CausaLote`, `Despesa`, `Referencia`, `ResultadoDespesa`,
   `ResultadoLote`. Testes que amarram a ordem dos enums à spec e a fronteira
