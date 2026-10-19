@@ -43,7 +43,7 @@
   - **Aceite:** `./gradlew --version` mostra Gradle 8.11.1 rodando no JDK 21,
     e `./gradlew build` termina com sucesso executando
     `AmbienteTest` › `build compila src e executa testes de tests`
-  - **Commit:** —
+  - **Commit:** `3c18414`; `.gitattributes` do `gradlew` em `c5a61d0`
 
 - [x] **T-002** — `value class Valor` com `normalizar` (`setScale(2, HALF_UP)`)
   como único construtor, e os testes de guarda da aritmética (DT-003).
@@ -53,7 +53,7 @@
     `RN-011 AMB-014 100,005 normaliza para 100,01 e 100,004 para 100,00`,
     `RN-011 AMB-014 −45,005 normaliza para −45,01 afastando-se do zero`,
     `RN-011 AMB-014 54,90 e 54,900 são o mesmo valor`
-  - **Commit:** —
+  - **Commit:** `9abc75c`
 
 - [x] **T-003** — Função `aparar()` no domínio com o conjunto explícito dos 25
   code points da propriedade Unicode `White_Space` (DT-005).
@@ -62,7 +62,7 @@
     `§4-1 aparar remove os 25 code points White_Space nas extremidades`,
     `§4-1 aparar remove U+0085 e não remove U+001C a U+001F`,
     `§4-1 aparar não remove espaços do meio do texto`
-  - **Commit:** —
+  - **Commit:** `15ce265`
 
 - [x] **T-004** — Modelo do domínio (plan §3.1, §3.2, §4): `Lido`, `LoteLido`,
   `Categoria` e `Politica` em `Politica.kt`, `Motivo`, `CampoDespesa`, `Falha`,
@@ -74,7 +74,7 @@
     `OrdemMotivosSecao8Test` › `§8 AMB-018 ordem de Motivo é a ordem da lista de elegibilidade da spec`,
     `OrdemCamposSecao41Test` › `§4-1 AMB-021 ordem de CampoDespesa é a ordem da tabela de despesa da spec`,
     `FronteiraDominioTest` › `DT-009 nenhum arquivo do dominio importa kotlinx ou java io`
-  - **Commit:** —
+  - **Commit:** `b6734a8`
 
 ## Fase 2 — Regras de negócio
 
@@ -97,7 +97,7 @@ Todos os testes desta fase constroem `LoteLido` direto, sem JSON (plan §6).
     `RN-012 AMB-020 d-006 com espaço à esquerda repete d-006 → lote rejeitado`,
     `RN-012 d-006 e D-006 são identificadores distintos`,
     `RN-012 identificadores d-001 a d-014 distintos → sem erro de lote`
-  - **Commit:** —
+  - **Commit:** `bcfc828`
 
 - [x] **T-006** — Validação de item, campos: informação obrigatória ausente,
   tipo incompatível, data inexistente, texto obrigatório vazio após `aparar()`
@@ -116,7 +116,7 @@ Todos os testes desta fase constroem `LoteLido` direto, sem JSON (plan §6).
     `RN-010 data 2026-02-30 → erro de item data inexistente`,
     `RN-010 AMB-021 sem fornecedor e valor −5,00 → causas fornecedor ausente e valor não positivo nessa ordem`,
     `RN-010 erro de item em uma despesa não altera o resultado das demais`
-  - **Commit:** —
+  - **Commit:** `e375e73`
 
 - [x] **T-007** — Validação de item, identidade: identificador aparado,
   `Referencia.Posicao` (contada a partir de 1) quando o identificador falta ou
@@ -129,7 +129,7 @@ Todos os testes desta fase constroem `LoteLido` direto, sem JSON (plan §6).
     `RN-010 AMB-020 elemento que não é despesa → erro de item na sua posição com causa única`,
     `AMB-021 sem identificador e data 2026-02-30 → causas identificador ausente e data inexistente nessa ordem`,
     `RN-012 AMB-020 identificador com espaços nas extremidades é considerado aparado`
-  - **Commit:** —
+  - **Commit:** `6868228`
 
 - [x] **T-008** — `Motor.avaliar` com a etapa 2 (valor) da §8: limite nominal
   por despesa via `limiteAplicavel`, reembolso parcial com excedente.
@@ -150,7 +150,7 @@ Todos os testes desta fase constroem `LoteLido` direto, sem JSON (plan §6).
     `RN-002 transporte urbano de 90,00 → reembolso 80,00 parcial e excedente 10,00`,
     `RN-011 d-011 33,333 → reembolso 33,33 integral`,
     `RN-011 alimentacao de 60,004 → reembolso 60,00 integral`
-  - **Commit:** —
+  - **Commit:** `5af7f0b`
 
 - [x] **T-009** — Etapa 1.1 da §8: pertinência ao período, bordas inclusivas,
   e recusa com `FORA_DA_COMPETENCIA` sem avaliação contra o limite.
@@ -164,7 +164,7 @@ Todos os testes desta fase constroem `LoteLido` direto, sem JSON (plan §6).
     `RN-005 d-001 a d-014 exceto d-008 e d-009 → dentro do período`,
     `RN-006 AMB-010 d-008 alimentacao 41,00 com NF → recusada com FORA_DA_COMPETENCIA sem limite aplicado`,
     `RN-006 despesa em 2026-08-01 com NF → recusada com FORA_DA_COMPETENCIA`
-  - **Commit:** —
+  - **Commit:** `41f8d4f`
 
 - [x] **T-010** — Normalização de categoria e fornecedor (`aparar()` +
   `lowercase()`) na construção de `Despesa`; etapa 1.2 da §8: elegibilidade
@@ -180,7 +180,7 @@ Todos os testes desta fase constroem `LoteLido` direto, sem JSON (plan §6).
     `RN-008 AMB-013 ALIMENTACAO em localidade turca ou azerbaijana → alimentacao`,
     `RN-008 AMB-013 fornecedores ΟΔΟΣ e Οδος → a mesma chave οδος`,
     `RN-008 AMB-013 ALİMENTACAO com U+0130 → recusada com CATEGORIA_INELEGIVEL`
-  - **Commit:** —
+  - **Commit:** `97504e0`
 
 - [x] **T-011** — Etapa 1.3 da §8: exigência de nota fiscal sobre o valor
   normalizado (`Politica.LIMIAR_NOTA_FISCAL`) e recusa com `SEM_NOTA_FISCAL`.
@@ -198,7 +198,7 @@ Todos os testes desta fase constroem `LoteLido` direto, sem JSON (plan §6).
     `RN-004 AMB-005 alimentacao 500,00 sem NF → recusada com SEM_NOTA_FISCAL`,
     `RN-004 AMB-005 hospedagem 200,00 sem NF → recusada com SEM_NOTA_FISCAL apesar de estar abaixo do limite`,
     `RN-004 d-003 e transporte 100,01 com NF → regra não se aplica, reembolso 80,00 parcial`
-  - **Commit:** —
+  - **Commit:** `dcc4601`
 
 - [x] **T-012** — Lista de motivos: todas as regras de elegibilidade avaliadas
   sem interrupção, lista ordenada por `Motivo.ordinal`, recusa sem limite,
@@ -212,7 +212,7 @@ Todos os testes desta fase constroem `LoteLido` direto, sem JSON (plan §6).
     `RN-007 d-001 parcial → lista de motivos vazia`,
     `RN-007 AMB-017 d-009 erro → lista de motivos vazia`,
     `§8 despesa recusada não tem limite aplicado`
-  - **Commit:** —
+  - **Commit:** `5db55cc`
 
 - [x] **T-013** — Etapa 1.4 da §8: duplicidade em duas passadas, só entre
   despesas sem motivo, com comparador de identificadores por code point
@@ -233,7 +233,7 @@ Todos os testes desta fase constroem `LoteLido` direto, sem JSON (plan §6).
     `RN-011 AMB-014 54,90 e 54,904 → grupo de duplicatas`,
     `RN-009 AMB-017 despesa com erro de item não integra grupo`,
     `RN-009 AMB-013 fornecedores ΟΔΟΣ e Οδος → grupo de duplicatas`
-  - **Commit:** —
+  - **Commit:** `8d6c8b6`
 
 - [ ] **T-014** — Consolidado do lote: período avaliado, total reembolsado,
   quantidades por classificação e total; lote sem despesas.
