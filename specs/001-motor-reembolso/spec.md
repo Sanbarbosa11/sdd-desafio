@@ -1,6 +1,6 @@
 # Spec — Motor de Cálculo de Reembolso
 
-**Versão:** 1.1 · **Status:** completa · **Última alteração:** 2026-10-18
+**Versão:** 1.2 · **Status:** completa · **Última alteração:** 2026-10-18
 
 ---
 
@@ -94,7 +94,8 @@ número, indicação de nota fiscal que não é sim ou não, fornecedor que não
 texto —, quando a data não existe no
 calendário, quando o valor normalizado é menor ou igual a zero, ou quando o
 elemento da relação de despesas não é uma despesa (AMB-020). Todas as causas
-aplicáveis são reportadas (AMB-021).
+aplicáveis são reportadas (AMB-021); o elemento que não é uma despesa tem
+uma única causa: a própria despesa, com tipo incompatível (AMB-020).
 
 ### 4.2 Saída
 
@@ -115,7 +116,7 @@ apresentação.
 | Exigência de nota fiscal: exigida ou não exigida | integral, parcial e recusada | RN-003; "d-003 → nota fiscal não exigida" e "transporte de 100,01 com NF → exigida e presente" produzem o mesmo reembolso, e sem esta informação os dois aceites não se distinguem |
 | Lista de motivos de recusa, na ordem da §8 | sempre; vazia em integral, parcial e erro | RN-007, AMB-018 |
 | Despesa mantida: o identificador da despesa que permaneceu com o reembolso | quando a lista de motivos contém DUPLICATA | RN-009; permite verificar qual despesa do grupo foi mantida e que inverter a ordem da entrada não a altera |
-| Causas do erro: para cada informação que falhou, qual e de que forma — ausente, tipo incompatível, data inexistente ou valor não positivo —, todas as aplicáveis, na ordem em que as informações da despesa são declaradas na §4.1 | erro | RN-010, AMB-017, AMB-021; separadas da lista de motivos, porque erro não é recusa (RN-007) |
+| Causas do erro: para cada informação que falhou, qual e de que forma — ausente, tipo incompatível, data inexistente ou valor não positivo —, todas as aplicáveis, na ordem em que as informações da despesa são declaradas na §4.1; o elemento da relação que não é uma despesa tem uma única causa: a própria despesa, com tipo incompatível | erro | RN-010, AMB-017, AMB-020, AMB-021; separadas da lista de motivos, porque erro não é recusa (RN-007) |
 
 Esses campos, em conjunto, são a justificativa de cada despesa: respondem por
 que ela recebeu o que recebeu. Uma frase legível construída a partir deles é
@@ -130,8 +131,12 @@ motivos de recusa é escrita entre colchetes, na ordem da §8 — por exemplo,
 motivos [FORA_DA_COMPETENCIA, SEM_NOTA_FISCAL]. Os códigos de motivo escritos
 em maiúsculas (FORA_DA_COMPETENCIA, CATEGORIA_INELEGIVEL, SEM_NOTA_FISCAL,
 DUPLICATA) são identificadores de negócio definidos por esta spec, não nomes
-de implementação. Nem os colchetes nem a grafia dos códigos prescrevem a
-forma da saída.
+de implementação. Do mesmo modo, alimentacao, transporte_urbano e hospedagem
+são o vocabulário de valores de categoria da entrada: identificadores de
+negócio definidos por esta spec, escritos sem acento e com o separador
+sublinhado, e não nomes de implementação; é com eles que a categoria
+normalizada é comparada (RN-008, AMB-013). Nem os colchetes nem a grafia dos
+códigos de motivo prescrevem a forma da saída.
 
 **Consolidado do lote.**
 
@@ -300,8 +305,9 @@ reembolso 0,00 e é classificada como recusada, com o motivo
 FORA_DA_COMPETENCIA na sua lista de motivos (RN-007). O item aparece na saída
 com seus motivos, como qualquer outro. A recusa independe do limite da
 categoria: o item não é avaliado contra o limite (RN-001, RN-002). Uma
-despesa fora do período não participa de nenhuma agregação ou comparação com
-outras despesas.
+despesa fora do período não é avaliada por nenhuma regra de valor e não
+integra grupo de duplicatas (RN-009); as demais regras de elegibilidade
+continuam a ser avaliadas e acrescentam seus motivos (RN-007).
 **Origem:** política do RH, item 7; decisões AMB-010 e AMB-018
 **Depende de:** RN-005 (período e pertinência); RN-007 (lista de motivos).
 **Aceite:**
@@ -379,9 +385,10 @@ erro de item nunca é mantida nem recusada como duplicata. Dentro de um grupo,
 a despesa de menor identificador é avaliada normalmente e as demais são
 recusadas, com o motivo DUPLICATA na sua lista de motivos (RN-007). Os
 identificadores são comparados em ordem lexicográfica, caractere a
-caractere, pelos códigos dos caracteres, sem extração de número e sem
-normalização de caixa: letras maiúsculas precedem as minúsculas, e, com
-identificadores de larguras diferentes, "d-10" precede "d-9". O resultado
+caractere, pelo ponto de código Unicode de cada caractere, sem extração de
+número e sem normalização de caixa: letras maiúsculas precedem as
+minúsculas, e, com identificadores de larguras diferentes, "d-10" precede
+"d-9". O resultado
 não depende da ordem das despesas na entrada.
 **Origem:** política do RH, item 8; decisão AMB-011
 **Depende de:** RN-007 (lista de motivos); RN-008 (categoria e fornecedor
@@ -412,7 +419,11 @@ normalizados); RN-011 (valor normalizado).
   "BISTRO CENTRAL" → grupo de duplicatas.
 - Duas despesas iguais no critério, com identificadores "d-006" e "D-006" →
   grupo de duplicatas; mantém-se "D-006", que precede "d-006" pela ordem dos
-  códigos dos caracteres; "d-006" → motivos [DUPLICATA].
+  pontos de código; "d-006" → motivos [DUPLICATA].
+- Duas despesas iguais no critério, com identificadores que diferem apenas no
+  último caractere — U+FF71 (ｱ, katakana de meia largura) num e U+1F600 (😀)
+  no outro → mantém-se o de U+FF71, cujo ponto de código é menor; o outro →
+  motivos [DUPLICATA].
 
 ### RN-010 — Validação da entrada: erro de lote e erro de item
 
@@ -448,6 +459,8 @@ situações:
    não é avaliada por nenhuma regra de elegibilidade ou de valor; não integra
    grupo de duplicatas (RN-009). A saída traz todas as causas do erro, na
    ordem em que as informações da despesa são declaradas na §4.1 (AMB-021);
+   o elemento que não é uma despesa tem uma única causa: a própria despesa,
+   com tipo incompatível (AMB-020);
    a despesa cujo identificador falta ou tem tipo incompatível é identificada
    pela sua posição na relação de despesas, contada a partir de um (AMB-020).
    As demais despesas do lote são processadas normalmente.
@@ -494,7 +507,8 @@ identificador); §4.1 (contrato de entrada).
 - Duas despesas sem identificador → ambas erro de item; não constituem
   identificador repetido; o lote não é rejeitado.
 - Elemento da relação de despesas que não é uma despesa → erro de item,
-  identificado pela sua posição; as demais despesas são processadas.
+  identificado pela sua posição, com uma única causa: a própria despesa, com
+  tipo incompatível; as demais despesas são processadas.
 - Relação de despesas com tipo incompatível → lote rejeitado.
 - Período com tipo incompatível → lote rejeitado.
 - Entrada sintaticamente válida cuja estrutura não é a de um lote — por
@@ -985,8 +999,9 @@ saída.
 - d-008 (alimentação, 41,00, com NF, 15/04) → reembolso 0,00, recusado,
   motivos [FORA_DA_COMPETENCIA]
 - d-014 (31/07) → dentro do período; esta regra não se aplica
-- uma despesa fora do período não participa de nenhuma agregação ou
-  comparação com outras despesas
+- uma despesa fora do período não é avaliada por nenhuma regra de valor e não
+  integra grupo de duplicatas; as demais regras de elegibilidade continuam a
+  ser avaliadas e acrescentam seus motivos (RN-007)
 
 **Regra afetada:** RN-006
 
@@ -1001,10 +1016,11 @@ sistema faz com um grupo de duplicatas.
 coincidem em data, categoria normalizada (AMB-013), fornecedor normalizado
 (AMB-013) e valor normalizado (AMB-014). A descrição e a presença de nota
 fiscal não integram o critério. Dentro de um grupo, a despesa de menor
-identificador — na ordem dos códigos dos caracteres, comparados um a um
-(RN-009) — é avaliada normalmente e as demais são recusadas, com o motivo
-DUPLICATA em sua lista de motivos. Despesas já recusadas por outra regra de
-elegibilidade não integram grupos de duplicatas.
+identificador — na ordem dos pontos de código Unicode dos caracteres,
+comparados um a um (RN-009) — é avaliada normalmente e as demais são
+recusadas, com o motivo DUPLICATA em sua lista de motivos. Despesas já
+recusadas por outra regra de elegibilidade não integram grupos de
+duplicatas.
 **Justificativa:** incluir a descrição no critério faria uma diferença de
 acentuação ou de redação desfazer a detecção, e a spec já estabeleceu que a
 descrição não é interpretada; exigir apenas o identificador repetido tornaria
@@ -1014,9 +1030,14 @@ também o lançamento legítimo, e reembolsar todas registrando um alerta
 trataria "devem ser tratadas" como recomendação — objeção já levantada na
 AMB-005. Manter a de menor identificador, e não a primeira da entrada,
 preserva o critério de aceite da RN-001, segundo o qual inverter a ordem das
-despesas na entrada não altera nenhum resultado. A ordenação pelos códigos
-dos caracteres é a única que produz resultado determinístico
+despesas na entrada não altera nenhum resultado. A ordenação pelos pontos de
+código é a única que produz resultado determinístico
 independentemente de configuração regional ou de convenção alfabética local;
+e é o ponto de código, e não a forma como o texto é codificado, porque a
+comparação precisa ser independente da representação interna de texto
+adotada pela implementação: em representações que dividem um caractere fora
+do plano multilíngue básico em duas unidades, a ordem por unidade diverge da
+ordem por caractere, e a despesa mantida mudaria com a representação;
 uma ordenação que ignore a caixa deixaria "d-006" e "D-006" empatados, sem
 critério de desempate, e a independência de ordem exigida pela RN-001 só se
 garante com um critério total.
@@ -1040,6 +1061,8 @@ lançamentos pelo valor efetivo de cada um.
   grupo de duplicatas
 - uma despesa fora do período (RN-006) não integra grupo de duplicatas, nem
   como mantida nem como recusada
+- identificadores que diferem apenas por U+FF71 num e U+1F600 no outro → o
+  de U+FF71 precede, por ter o menor ponto de código
 
 **Regra afetada:** RN-009; AMB-009 (data de cada diária)
 
@@ -1075,8 +1098,9 @@ que possuem limite, podendo haver outras elegíveis sem teto.
 **Decisão:** a categoria é normalizada antes da comparação, convertendo-se
 maiúsculas em minúsculas e removendo-se espaços nas extremidades. Nenhuma
 outra transformação é aplicada: acentuação, separadores e sinônimos não são
-normalizados. As categorias elegíveis são exatamente três — alimentação,
-transporte urbano e hospedagem. Qualquer outra categoria é inelegível, e a
+normalizados. As categorias elegíveis são exatamente três — alimentacao,
+transporte_urbano e hospedagem, na grafia do vocabulário de categoria
+(§4.2, Notação). Qualquer outra categoria é inelegível, e a
 despesa é recusada com o motivo CATEGORIA_INELEGIVEL em sua lista de motivos.
 **Justificativa:** a categoria é campo estruturado com vocabulário fechado, e
 uniformizar a caixa não constitui interpretação de texto livre — distingue-se,
@@ -1105,7 +1129,7 @@ com nota fiscal) é recusado, embora seja despesa plausível de trabalho. A
 inclusão de novas categorias cabe ao RH, por alteração da política.
 **Consequências verificáveis:**
 - d-014 ("ALIMENTACAO", 61,00, com NF, 31/07) → categoria normalizada para
-  alimentação; dentro do período; reembolso 60,00, parcial; lista de motivos
+  alimentacao; dentro do período; reembolso 60,00, parcial; lista de motivos
   vazia
 - d-005 ("coworking", 89,00, com NF) → reembolso 0,00, recusado, motivos
   [CATEGORIA_INELEGIVEL]
@@ -1571,9 +1595,10 @@ O sistema está pronto quando:
 - [ ] Uma despesa com informação obrigatória ausente — inclusive o
   identificador —, tipo incompatível, data inexistente ou valor normalizado
   menor ou igual a zero, ou que não é uma despesa, recebe classificação erro,
-  reembolso 0,00, todas as causas do erro na ordem da §4.1 e lista de motivos
-  vazia; sem identificador, é identificada pela posição; as demais despesas
-  são processadas normalmente (RN-010, AMB-020, AMB-021; d-009).
+  reembolso 0,00, todas as causas do erro na ordem da §4.1 — ou, se não é
+  uma despesa, a causa única "a própria despesa, com tipo incompatível" — e
+  lista de motivos vazia; sem identificador, é identificada pela posição; as
+  demais despesas são processadas normalmente (RN-010, AMB-020, AMB-021; d-009).
 - [ ] Espaços nas extremidades são todos os caracteres de espaço em branco do
   padrão Unicode, e o identificador apresentado é o normalizado (§4.1,
   RN-012).
@@ -1596,7 +1621,7 @@ O sistema está pronto quando:
   RN-004; d-003, d-004, d-013).
 - [ ] Despesas que coincidem em data, categoria e fornecedor normalizados e
   valor normalizado formam grupo; mantém-se a de menor identificador pela
-  ordem dos códigos dos caracteres, e as demais recebem DUPLICATA; despesas
+  ordem dos pontos de código Unicode, e as demais recebem DUPLICATA; despesas
   com outro motivo ou com erro não integram grupo (RN-009; d-006, d-007).
 - [ ] Todos os motivos de recusa aplicáveis são reportados, na ordem da §8, e
   o reembolso parcial não é motivo (RN-007).

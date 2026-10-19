@@ -10,6 +10,91 @@ Ordem cronológica inversa: a mais recente primeiro.
 
 ---
 
+## D-010 — Achados de revisão independente da spec antes das regras de negócio · `2026-10-18`
+
+**Gatilho:** revisão independente da spec 1.1 por um subagente com contexto
+limpo — sem ter participado de nenhuma decisão e sem acesso a plan.md,
+tasks.md, DECISIONS.md ou código —, feita depois da fundação (T-001 a T-004)
+e antes da implementação das regras de negócio (T-005 em diante). O
+subagente procurou contradições, indeterminações, decisões não refletidas
+nas regras e vazamentos técnicos, e relatou com citação, sem alterar nada.
+Quatro achados foram corrigidos aqui; os demais são de redação e não alteram
+nenhum resultado (ver Pendente).
+
+**O que mudou na spec (versão 1.1 → 1.2):**
+- **Ponto de código (achado D4, reclassificado).** RN-009, AMB-011 e §9: de
+  "pelos códigos dos caracteres" para "pelo ponto de código Unicode de cada
+  caractere". AMB-011, Justificativa: acrescentado o porquê. RN-009 e
+  AMB-011: um caso acrescentado — identificadores que diferem apenas por
+  U+FF71 e U+1F600 → o de U+FF71 é mantido.
+- **Vocabulário de categoria (achados A1 e D5).** §4.2, Notação: alimentacao,
+  transporte_urbano e hospedagem declarados como vocabulário de valores de
+  categoria da entrada — identificadores de negócio definidos pela spec, como
+  os códigos de motivo. AMB-013, Decisão: de "exatamente três — alimentação,
+  transporte urbano e hospedagem" para "exatamente três — alimentacao,
+  transporte_urbano e hospedagem, na grafia do vocabulário de categoria".
+  AMB-013, Consequências: d-014 de "normalizada para alimentação" para
+  "normalizada para alimentacao".
+- **Causa única do elemento que não é despesa (achados C1 e B1).** §4.1
+  (Despesa inválida), RN-010 (item 2 e aceite), §4.2 (Causas do erro, com
+  AMB-020 acrescentada à origem) e §9: o elemento da relação que não é uma
+  despesa tem uma única causa — a própria despesa, com tipo incompatível. A
+  decisão já existia na AMB-020; não tinha chegado às regras que ela declara
+  afetar.
+- **Alcance da despesa fora do período (achado A5).** RN-006 e AMB-010,
+  Consequências: de "não participa de nenhuma agregação ou comparação com
+  outras despesas" para "não é avaliada por nenhuma regra de valor e não
+  integra grupo de duplicatas; as demais regras de elegibilidade continuam a
+  ser avaliadas e acrescentam seus motivos (RN-007)".
+
+**Classificação:** esclarecimentos. Nenhuma AMB nova: cada correção declara
+o alcance de um termo ou leva uma decisão existente às regras que ela já
+afetava.
+- O ponto de código é o achado mais sério. O subagente o classificou como
+  possível vazamento técnico de gravidade baixa; ele é, na verdade, regra de
+  negócio decidida fora da spec. "Códigos dos caracteres" não dizia se eram
+  pontos de código ou unidades de codificação, e quem decidiu foi a DT-007
+  do plan — o que o CLAUDE.md proíbe. A diferença muda qual despesa é
+  mantida quando um identificador tem caractere fora do plano multilíngue
+  básico. Justificativa da escolha: a comparação precisa ser independente da
+  representação interna de texto adotada pela implementação.
+- O vocabulário de categoria fecha o A1 pela raiz: a AMB-013 dizia que
+  acentuação e separadores não são normalizados e, em seguida, listava como
+  elegível justamente a grafia acentuada e com espaço.
+- No A5, a redação "não participa de nenhuma regra de elegibilidade nem de
+  valor" foi considerada e descartada: contradiria a RN-007 e o caso da §7
+  em que a despesa de 150,00 sem NF fora do período recebe
+  [FORA_DA_COMPETENCIA, SEM_NOTA_FISCAL]. A restrição adotada nomeia o que
+  de fato não se aplica — regras de valor e duplicidade — e deixa explícito
+  que a RN-012 (identificador) e o consolidado continuam a considerar a
+  despesa.
+
+**Por quê:** cada um dos quatro achados admitia leituras com resultados
+diferentes, ou deixava uma decisão fora da spec. Corrigi-los antes da T-005
+evita que o código fixe uma das leituras por conta própria.
+
+**O que isso invalidou:** nenhum critério de aceite. O resultado do lote de
+exemplo é o mesmo. A RN-009 ganhou um caso; a RN-010 explicita a causa de um
+caso que já existia.
+
+**Tasks afetadas:** nenhuma precisa ser reescrita. T-007 (causa única: o
+modelo já tem `CampoDespesa.DESPESA`) e T-013 (o teste
+`RN-009 identificador fora do BMP é comparado por code point` passa a
+verificar um aceite da spec, e não só a DT-007) já seguiam as leituras
+adotadas. A DT-007 do plan deixa de decidir e passa a implementar a RN-009.
+
+**Pendente:** achados de redação da mesma revisão, sem efeito em resultado,
+para uma passada final — A2 (Justificativa da AMB-018 sobre "rótulo"), A3
+("três campos" na AMB-015, que abrange cinco), A4 (§1 descreve as 21 AMB
+como lacunas preenchidas por conferentes), B2 (caso de 150,00 sem categoria
+fixada), D1 (referências a "plan.md" por nome de arquivo), D2 (frase do
+template sobre tasks na §5), D3 ("sintaticamente válida") e D6 (histórico de
+processo na AMB-020 e AMB-021).
+
+**Custo:** 2 arquivos (spec.md, DECISIONS.md), correção pontual.
+
+---
+
 ## D-009 — Lacunas de validação descobertas ao projetar a implementação; AMB-020 e AMB-021 · `2026-10-18`
 
 **Gatilho:** a redação do plan.md. Ao desenhar o modelo de dados e o
