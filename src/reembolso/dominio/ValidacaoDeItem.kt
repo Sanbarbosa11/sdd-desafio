@@ -5,6 +5,23 @@ sealed interface ItemValidado {
     data class Invalido(val erro: ResultadoDespesa.ComErro) : ItemValidado
 }
 
+// AMB-020: a posição na relação de despesas conta a partir de 1.
+fun validarItens(elementos: List<ElementoLido>): List<ItemValidado> =
+    elementos.mapIndexed { indice, elemento -> validarElemento(elemento, indice + 1) }
+
+fun validarElemento(elemento: ElementoLido, posicao: Int): ItemValidado = when (elemento) {
+    // AMB-020: causa única — a própria despesa, com tipo incompatível.
+    ElementoLido.NaoEDespesa -> ItemValidado.Invalido(
+        ResultadoDespesa.ComErro(
+            ref = Referencia.Posicao(posicao),
+            valorConsiderado = null,
+            categoriaConsiderada = null,
+            causas = listOf(CausaErro(CampoDespesa.DESPESA, Falha.TIPO_INCOMPATIVEL)),
+        ),
+    )
+    is ElementoLido.DespesaLida -> validarDespesa(elemento, posicao)
+}
+
 // RN-010 (erro de item). Causas na ordem de CampoDespesa, que é a da §4.1 (AMB-021).
 // `posicao` conta a partir de 1 e só aparece na saída quando falta identificador (AMB-020).
 fun validarDespesa(lida: ElementoLido.DespesaLida, posicao: Int): ItemValidado {

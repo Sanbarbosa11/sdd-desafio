@@ -118,7 +118,7 @@ Todos os testes desta fase constroem `LoteLido` direto, sem JSON (plan §6).
     `RN-010 erro de item em uma despesa não altera o resultado das demais`
   - **Commit:** —
 
-- [ ] **T-007** — Validação de item, identidade: identificador aparado,
+- [x] **T-007** — Validação de item, identidade: identificador aparado,
   `Referencia.Posicao` (contada a partir de 1) quando o identificador falta ou
   tem tipo incompatível, elemento que não é despesa, ausências que não contam
   como repetição.
